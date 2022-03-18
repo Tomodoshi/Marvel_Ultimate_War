@@ -1,0 +1,5 @@
+package Projectstuff;
+
+public enum Condition {
+   ACTIVE,INACTIVE,KNOCKEDOUT 
+}
