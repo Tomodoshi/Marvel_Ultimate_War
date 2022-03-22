@@ -18,6 +18,16 @@ public class Game {
 	public Game(Player first, Player second) {
 
 	}
+	
+	private void placeChampion(){
+		board [1][0] = firstPlayer.getTeam<0>;
+		board [2][0] = firstPlayer.getTeam<1>;
+		board [3][0] = firstPlayer.getTeam<2>;
+		
+		board[1][4] = secondPlayer.getTeam<0>;
+		board[2][4] = secondPlayer.getTeam<1>;
+		board[3][4] = secondPlayer.getTeam<2>;
+	}
 
 	public Player getFirstPlayer() {
 		return firstPlayer;
