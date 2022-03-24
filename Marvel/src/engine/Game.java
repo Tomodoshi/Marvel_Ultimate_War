@@ -3,7 +3,11 @@ package engine;
 import model.world.Champion;
 import model.abilities.Ability;
 import model.world.Cover;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.lang.String;
 
 public class Game {
 	private Player firstPlayer;
@@ -26,11 +30,33 @@ public class Game {
 	}
 	
 	private void placeChampion(){
-		
+		//add Champions here
 	}
 	
 	private void placeCovers(){
-		//add here
+		//add Covers here
+	}
+	
+	public static void loadChampions(String filePath) throws IOException {
+		String currentLine = "";
+		FileReader fileReader = new FileReader(filePath);
+		BufferedReader br = new BufferedReader(fileReader);
+		while ((currentLine = br.readLine())!= null) {
+			String [] result = currentLine.split((","));
+			//add Champions from CSV
+		}
+		br.close();
+	}
+	
+	public static void loadAbilities(String filePath) throws IOException {
+		String currentLine = "";
+		FileReader fileReader = new FileReader(filePath);
+		BufferedReader br = new BufferedReader(fileReader);
+		while ((currentLine = br.readLine())!= null) {
+			String [] result = currentLine.split((","));
+			//add abilities from CSV
+		}
+		br.close();
 	}
 
 	public Player getFirstPlayer() {
