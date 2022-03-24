@@ -1,6 +1,7 @@
 package engine;
 
 import model.world.Champion;
+import model.abilities.Ability;
 import model.world.Cover;
 import java.util.ArrayList;
 
@@ -9,25 +10,23 @@ public class Game {
 	private Player secondPlayer;
 	private boolean firstLeaderAbilityUsed;
 	private boolean secondLeaderAbilityUsed;
-	private Object[][] board = new Object[5][5];
+	private Object[][] board;
 	private static ArrayList<Champion> availableChampions;
 	private static ArrayList<Ability> availableAbilities;
 	private PriorityQueue turnOrder;
-	private final static int BOARDHEIGHT;
-	private final static int BOARDWIDTH;
+	private final static int BOARDHEIGHT = 0;
+	private final static int BOARDWIDTH = 0;
 
 	public Game(Player first, Player second) {
-		//revise
+		board = new Object[5][5];
+		this.firstPlayer = first;
+		this.secondPlayer = second;
+		placeChampion();
+		placeCovers();
 	}
 	
 	private void placeChampion(){
-		board [1][0] = firstPlayer.getTeam<0>;
-		board [2][0] = firstPlayer.getTeam<1>;
-		board [3][0] = firstPlayer.getTeam<2>;
 		
-		board[1][4] = secondPlayer.getTeam<0>;
-		board[2][4] = secondPlayer.getTeam<1>;
-		board[3][4] = secondPlayer.getTeam<2>;
 	}
 	
 	private void placeCovers(){
