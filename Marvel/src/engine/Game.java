@@ -38,6 +38,7 @@ public class Game {
 	}
 	
 	public static void loadChampions(String filePath) throws IOException {
+		availableChampions = new ArrayList<Champion>();
 		String currentLine = "";
 		FileReader fileReader = new FileReader(filePath);
 		BufferedReader br = new BufferedReader(fileReader);
@@ -49,6 +50,7 @@ public class Game {
 	}
 	
 	public static void loadAbilities(String filePath) throws IOException {
+		availableAbilities = new ArrayList<Ability>();
 		String currentLine = "";
 		FileReader fileReader = new FileReader(filePath);
 		BufferedReader br = new BufferedReader(fileReader);
