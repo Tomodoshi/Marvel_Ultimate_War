@@ -6,4 +6,8 @@ public class GameActionException extends Exception {
 		super();
 	}
 	
+	public static void main(String[] args) {
+		
+	}
+	
 }
