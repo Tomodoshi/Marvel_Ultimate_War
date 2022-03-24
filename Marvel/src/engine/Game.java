@@ -1,6 +1,7 @@
 package engine;
 
 import model.world.Champion;
+import model.world.Cover;
 import java.util.ArrayList;
 
 public class Game {
@@ -16,7 +17,7 @@ public class Game {
 	private final static int BOARDWIDTH;
 
 	public Game(Player first, Player second) {
-
+		//revise
 	}
 	
 	private void placeChampion(){
@@ -27,6 +28,10 @@ public class Game {
 		board[1][4] = secondPlayer.getTeam<0>;
 		board[2][4] = secondPlayer.getTeam<1>;
 		board[3][4] = secondPlayer.getTeam<2>;
+	}
+	
+	private void placeCovers(){
+		//add here
 	}
 
 	public Player getFirstPlayer() {
@@ -70,4 +75,3 @@ public class Game {
 	}
 
 }
-
