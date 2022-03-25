@@ -44,7 +44,7 @@ public class Game {
 		BufferedReader br = new BufferedReader(fileReader);
 		while ((currentLine = br.readLine())!= null) {
 			String [] result = currentLine.split((","));
-			//add Champions from CSV
+			//Champion c = new Champion(result[1], )
 		}
 		br.close();
 	}
@@ -56,7 +56,8 @@ public class Game {
 		BufferedReader br = new BufferedReader(fileReader);
 		while ((currentLine = br.readLine())!= null) {
 			String [] result = currentLine.split((","));
-			//add abilities from CSV
+			Ability a = new Ability(result[0],Integer.parseInt(result[2]), Integer.parseInt(result[3], Integer.parseInt(result[4]), result[5], Integer.parseInt(result[6])));
+			availableAbilities.add(a);
 		}
 		br.close();
 	}
