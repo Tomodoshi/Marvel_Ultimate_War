@@ -1,0 +1,13 @@
+package exceptions;
+//i changed it from LeaderAbilityAlreadyUsedExcecption
+public class LeaderAbilityAlreadyUsedException extends GameActionException {
+
+	public LeaderAbilityAlreadyUsedException() {
+		super();
+	}
+	
+	public LeaderAbilityAlreadyUsedException(String s) {
+		super();
+		System.out.println(s);
+	}
+}
