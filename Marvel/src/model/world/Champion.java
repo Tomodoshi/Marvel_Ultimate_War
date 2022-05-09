@@ -1,11 +1,14 @@
 package model.world;
 
 import java.util.ArrayList;
+import engine.Player;
 import model.abilities.Ability;
-import model.effects.Effect;
+import model.effects.*;
+
+
 import java.awt.Point;
 
-public class Champion {
+public abstract class Champion implements Comparable {
 	private String name;
 	private int maxHP;
 	private int currentHP;
@@ -34,7 +37,46 @@ public class Champion {
 		abilities = new ArrayList<>();
 		appliedEffects = new ArrayList<>();
 	}
-
+	
+	public int compareTo(Object o) {
+		if(o instanceof Champion) {
+			if(this.speed > ((Champion)(o)).speed) {
+				return -1;
+			}else
+				if(this.speed < ((Champion)(o)).speed) 
+					return 1;
+				else 
+					if(this.name.compareTo(((Champion)(o)).name) < 0) {
+						return -1;
+					}
+					else return 1;
+		}else
+			return 0;
+	}
+	
+	public void useLeaderAbility(ArrayList<Champion> targets) {
+		if(this instanceof Hero)
+			for (Champion champion : targets) {
+				for (Effect  e : champion.getAppliedEffects()) {
+					if(e.getType() == EffectType.DEBUFF)
+						champion.appliedEffects.remove(e);
+				}
+			}
+		else
+			if(this instanceof Villain)
+				for (Champion champion : targets) {
+					float temp = champion.getCurrentHP()/champion.getMaxHP();
+					if(temp < 0.3)
+						champion.setCurrentHP(0);
+				}
+			else
+				if(this instanceof AntiHero) 
+					for (Champion champion : targets) {
+						Stun e = new Stun(2);
+						champion.appliedEffects.add(e); //except team leaders
+					}
+	}
+	
 	public int getCurrentHP() {
 		return currentHP;
 	}

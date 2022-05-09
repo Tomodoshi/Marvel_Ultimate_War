@@ -1,6 +1,11 @@
 package model.abilities;
 
-public class Ability {
+import java.util.ArrayList;
+
+import model.world.Cover;
+import model.world.Champion;
+
+public abstract class Ability {
 	private String name;
 	private int manaCost;
 	private int baseCooldown;
@@ -17,6 +22,12 @@ public class Ability {
 		this.castArea = area;
 		this.requiredActionPoints = required;
 
+	}
+	
+	public void execute(ArrayList<Damageable> targets) {
+		for (Damageable damageable : targets) {
+			damageable.setCurrentHP());// set HP to the amount of dmg
+		}
 	}
 
 	public String getName() {
@@ -42,14 +53,6 @@ public class Ability {
 
 	public int getBaseCooldown() {
 		return baseCooldown;
-	}
-
-	public int getCurentCooldown() {
-		return currentCooldown;
-	}
-
-	public void setCurentCooldown(int curentCooldown) {
-		this.currentCooldown = curentCooldown;
 	}
 
 	public int getCastRange() {
