@@ -44,14 +44,6 @@ public class Ability {
 		return baseCooldown;
 	}
 
-	public int getCurentCooldown() {
-		return currentCooldown;
-	}
-
-	public void setCurentCooldown(int curentCooldown) {
-		this.currentCooldown = curentCooldown;
-	}
-
 	public int getCastRange() {
 		return castRange;
 	}
