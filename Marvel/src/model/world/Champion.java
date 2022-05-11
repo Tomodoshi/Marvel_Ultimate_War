@@ -8,7 +8,7 @@ import model.effects.*;
 
 import java.awt.Point;
 
-public abstract class Champion implements Comparable {
+public abstract class Champion implements Comparable , Damageable {
 	private String name;
 	private int maxHP;
 	private int currentHP;

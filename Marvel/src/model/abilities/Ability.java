@@ -3,13 +3,15 @@ package model.abilities;
 import java.util.ArrayList;
 
 import model.world.Cover;
+import model.world.Damageable;
 import model.world.Champion;
+import model.abilities.DamagingAbility;
 
 public abstract class Ability {
 	private String name;
 	private int manaCost;
 	private int baseCooldown;
-	private int currentCooldown; // read and write
+	private int currentCooldown; //  and write
 	private int castRange;
 	private int requiredActionPoints;
 	private AreaOfEffect castArea;
@@ -25,8 +27,9 @@ public abstract class Ability {
 	}
 	
 	public void execute(ArrayList<Damageable> targets) {
-		for (Damageable damageable : targets) {
-			damageable.setCurrentHP());// set HP to the amount of dmg
+		for (Damageable a : targets) {
+			int temp = ((DamagingAbility)(this)).getDamageAmount();
+			a.setCurrentHP(a.getCurrentHP() - temp);
 		}
 	}
 
