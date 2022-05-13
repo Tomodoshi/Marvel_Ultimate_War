@@ -26,12 +26,7 @@ public abstract class Ability {
 
 	}
 	
-	public void execute(ArrayList<Damageable> targets) {
-		for (Damageable a : targets) {
-			int temp = ((DamagingAbility)(this)).getDamageAmount();
-			a.setCurrentHP(a.getCurrentHP() - temp);
-		}
-	}
+	public abstract void execute(ArrayList<Damageable> targets);
 
 	public String getName() {
 		return name;

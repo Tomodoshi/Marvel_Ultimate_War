@@ -1,6 +1,9 @@
 package model.effects;
+//import java.lang.Cloneable;
 
-public class Effect {
+import model.world.Champion;
+
+public abstract class Effect implements Cloneable {
 	private String name;
 	private int duration;
 	private EffectType type;
@@ -9,6 +12,11 @@ public class Effect {
 		this.name = name;
 		this.duration = duration;
 		this.type = type;
+	}
+	
+	public Object clone() //overriding the needed method from the cloneable interface
+		throws CloneNotSupportedException {
+		return super.clone();
 	}
 
 	public int getDuration() {
@@ -26,5 +34,11 @@ public class Effect {
 	public EffectType getType() {
 		return type;
 	}
+	
+	public abstract void apply(Champion c);
+	
+	public abstract void remove(Champion c);
+
 
 }
+
