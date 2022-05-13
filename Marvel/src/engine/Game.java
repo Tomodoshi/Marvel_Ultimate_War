@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import exceptions.NotEnoughResourcesException;
 import exceptions.UnallowedMovementException;
 import model.abilities.*;
 import model.effects.*;
@@ -104,18 +105,35 @@ public class Game {
 		return false;
 	}
 
-	public void castAbility(Ability a){
+	public void castAbility(Ability a)throws NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
 		int range = c.getAttackRange();
-		if(a.getCastArea() == AreaOfEffect.SURROUND){
+		ArrayList<Damageable> targets = new ArrayList<Damageable>();
+		if(a instanceof DamagingAbility){
 			for(int i = range*-1; i < range;i++){
 				for(int j = range*-1; i < range; i++){
 					if(i != 0 && j != 0){
-						
+						if(isDamageable(c.getLocation().y-i, c.getLocation().x-j)){
+							targets.add((Damageable)(board[c.getLocation().y-i][c.getLocation().x-j]));
+						}
 					}
 				}
 			}
+			((DamagingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
 		}
+		else
+			if(a instanceof HealingAbility){
+				for(int i = range*-1; i < range;i++){
+					for(int j = range*-1; i < range; i++){
+						if(i != 0 && j != 0){
+							if(board[c.getLocation().y-i][c.getLocation().x-j] instanceof Champion){
+								targets.add((Damageable)(board[c.getLocation().y-i][c.getLocation().x-j]));
+							}
+						}
+					}
+				}
+				((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+			}
 	}
 
 	public void placeChampions() {
