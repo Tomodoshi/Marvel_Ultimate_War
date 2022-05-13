@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import exceptions.UnallowedMovementException;
 import model.abilities.*;
 import model.effects.*;
 import model.world.*;
@@ -31,6 +32,90 @@ public class Game {
 		availableAbilities = new ArrayList<>();
 		placeChampions();
 		placeCovers();
+	}
+
+	public Champion getCurrentChampion(){
+		if(!turnOrder.isEmpty())
+			return (Champion)(turnOrder.remove());
+		else 
+			return null;
+	}
+
+	public Player checkGameOver(){
+		if(firstPlayer.getTeam().isEmpty()) 
+			return secondPlayer;
+		else
+			if(secondPlayer.getTeam().isEmpty())
+				return firstPlayer;
+			else
+				return null;
+	}
+
+	public void move(Direction d)throws UnallowedMovementException{
+		Champion c = this.getCurrentChampion();
+		Point t = c.getLocation();
+		switch(d){
+			case DOWN:
+				t.y--;
+				c.setLocation(t);break;
+			case UP: 
+				t.y++;
+				c.setLocation(t);break;
+			case LEFT: 
+				t.x--;
+				c.setLocation(t);break;
+			case RIGHT: 
+				t.x++;
+				c.setLocation(t);break;
+		}
+	}
+
+	public void attack(Direction d){
+		Champion c = this.getCurrentChampion();
+		ArrayList<Damageable> targets = new ArrayList<Damageable>();
+		int range = c.getAttackRange();
+		switch(d){
+			case DOWN:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y-i][c.getLocation().x])));
+				}break;
+			case LEFT:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x-i])));
+				}break;
+			case RIGHT:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x+i])));
+				}break;
+			case UP:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y+i][c.getLocation().x])));
+				}
+		}
+	}
+
+	public Boolean isDamageable(int y, int x){
+		if(board[y][x] instanceof Champion || board[y][x] instanceof Cover)
+			return true;
+		return false;
+	}
+
+	public void castAbility(Ability a){
+		Champion c = this.getCurrentChampion();
+		int range = c.getAttackRange();
+		if(a.getCastArea() == AreaOfEffect.SURROUND){
+			for(int i = range*-1; i < range;i++){
+				for(int j = range*-1; i < range; i++){
+					if(i != 0 && j != 0){
+						
+					}
+				}
+			}
+		}
 	}
 
 	public void placeChampions() {
