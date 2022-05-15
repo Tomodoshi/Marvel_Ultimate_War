@@ -99,12 +99,50 @@ public class Game {
 		}
 	}
 
+	public void castAbility(Ability a)throws NotEnoughResourcesException{
+		Champion c = this.getCurrentChampion();
+		int range = c.getAttackRange();
+		ArrayList<Damageable> targets = new ArrayList<Damageable>();
+		if(a instanceof DamagingAbility){
+			
+			((DamagingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+		}
+		else
+			if(a instanceof HealingAbility)
+				if(firstPlayer.getTeam().contains(c)){
+					for (Champion champ : firstPlayer.getTeam()) {
+						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= c.getAttackRange())
+							targets.add(champ);
+					}
+					((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+				}else{
+					for (Champion champ : secondPlayer.getTeam()) {
+						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= c.getAttackRange())
+							targets.add(champ);
+					}
+					((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+				}
+	}
+
+	public void castAbility(Ability a, int x, int y){
+		ArrayList<Damageable> targets = new ArrayList<Damageable>();
+		if(a instanceof HealingAbility){
+			if(board[y][x] instanceof Champion){
+				targets.add((Champion)(board[y][x]));
+				((HealingAbility)(a)).execute(targets);
+			}
+		}
+	}
+
+	// -----------------------------------Helper Methods--------------------------------------
+
 	public Boolean isDamageable(int y, int x){
 		if(board[y][x] instanceof Champion || board[y][x] instanceof Cover)
 			return true;
 		return false;
 	}
 
+<<<<<<< HEAD
 	public void castAbility(Ability a)throws NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
 		int range = c.getAttackRange();
@@ -134,6 +172,10 @@ public class Game {
 				}
 				((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
 			}
+=======
+	public static int getDistance(Point p1, Point p2){
+		return  (int)(Math.abs(p1.getX() - p2.getX()) - (int)(Math.abs(p1.getY() - p2.getY())));
+>>>>>>> 323a434fbb615503c80de93162b82093b4a74d6a
 	}
 	
 	
@@ -142,6 +184,9 @@ public class Game {
 			
 		}
 	}
+
+	// ---------------------------------------------------------------------------------------
+
 
 	public void placeChampions() {
 
