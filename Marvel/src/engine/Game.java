@@ -129,11 +129,18 @@ public class Game {
 							if(board[c.getLocation().y-i][c.getLocation().x-j] instanceof Champion){
 								targets.add((Damageable)(board[c.getLocation().y-i][c.getLocation().x-j]));
 							}
-						}
+						} 
 					}
 				}
 				((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
 			}
+	}
+	
+	
+	public void castAbility(Ability a, Direction d)throws NotEnoughResourcesException{
+		if(a instanceof AreaofEffect.DIRECTIONAL ) {
+			
+		}
 	}
 
 	public void placeChampions() {
