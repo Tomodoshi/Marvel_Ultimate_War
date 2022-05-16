@@ -104,20 +104,29 @@ public class Game {
 		int range = c.getAttackRange();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		if(a instanceof DamagingAbility){
-			
+			if(isFoe() == firstPlayer){
+				for (Champion d : firstPlayer.getTeam()) {
+					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+						targets.add(d);
+				}
+			}else
+			for (Champion d : secondPlayer.getTeam()) {
+				if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+					targets.add(d);
+			}
 			((DamagingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
 		}
 		else
 			if(a instanceof HealingAbility)
-				if(firstPlayer.getTeam().contains(c)){
-					for (Champion champ : firstPlayer.getTeam()) {
-						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= c.getAttackRange())
-							targets.add(champ);
+				if(isFoe() == firstPlayer){
+					for (Champion m : firstPlayer.getTeam()) {
+						if(m != c && getDistance(m.getLocation(), c.getLocation()) <= range)
+							targets.add(m);
 					}
 					((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
 				}else{
 					for (Champion champ : secondPlayer.getTeam()) {
-						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= c.getAttackRange())
+						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= range)
 							targets.add(champ);
 					}
 					((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
@@ -134,7 +143,7 @@ public class Game {
 		}
 	}
 
-	// -----------------------------------Helper Methods--------------------------------------
+	// ----------------------------------------Helper Methods--------------------------------------
 
 	public Boolean isDamageable(int y, int x){
 		if(board[y][x] instanceof Champion || board[y][x] instanceof Cover)
@@ -146,7 +155,15 @@ public class Game {
 		return  (int)(Math.abs(p1.getX() - p2.getX()) - (int)(Math.abs(p1.getY() - p2.getY())));
 	}
 
-	// ---------------------------------------------------------------------------------------
+	public Player isFoe(){
+		Champion c = getCurrentChampion();
+		if(firstPlayer.getTeam().contains(c))
+			return secondPlayer;
+		else
+			return firstPlayer;
+	}
+
+	// --------------------------------------------------------------------------------------------
 
 
 	public void placeChampions() {
