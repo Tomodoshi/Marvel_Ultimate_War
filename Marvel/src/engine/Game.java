@@ -37,7 +37,7 @@ public class Game {
 
 	public Champion getCurrentChampion(){
 		if(!turnOrder.isEmpty())
-			return (Champion)(turnOrder.remove());
+			return (Champion)(turnOrder.peekMin());
 		else 
 			return null;
 	}
@@ -52,22 +52,33 @@ public class Game {
 				return null;
 	}
 
-	public void move(Direction d)throws UnallowedMovementException{
+	public void move(Direction d)throws UnallowedMovementException, NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
-		Point t = c.getLocation();
+		if(c.getCurrentActionPoints()<1)
+		throw new NotEnoughResourcesException("not enough action points to move");
+		Point t = c.getLocation();// else needed ?
 		switch(d){
 			case DOWN:
 				t.y--;
-				c.setLocation(t);break;
+				if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					throw new UnallowedMovementException();
+				}else
+					c.setLocation(t);break;
 			case UP: 
-				t.y++;
-				c.setLocation(t);break;
+				t.y++;if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					throw new UnallowedMovementException();
+				}else
+					c.setLocation(t);break;
 			case LEFT: 
-				t.x--;
-				c.setLocation(t);break;
+				t.x--;if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					throw new UnallowedMovementException();
+				}else
+					c.setLocation(t);break;
 			case RIGHT: 
-				t.x++;
-				c.setLocation(t);break;
+				t.x++;if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					throw new UnallowedMovementException();
+				}else
+					c.setLocation(t);break;
 		}
 	}
 
@@ -101,10 +112,12 @@ public class Game {
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
+		if(c.getCurrentActionPoints() < a.getRequiredActionPoints())
+			throw new NotEnoughResourcesException();
 		int range = c.getAttackRange();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
-		if(a instanceof DamagingAbility){
-			if(isFoe() == firstPlayer){
+		if(a instanceof DamagingAbility && a.getCastArea() == AreaOfEffect.SURROUND){
+			if(getFoe() == firstPlayer){
 				for (Champion d : firstPlayer.getTeam()) {
 					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
 						targets.add(d);
@@ -114,22 +127,22 @@ public class Game {
 				if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
 					targets.add(d);
 			}
-			((DamagingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+			((DamagingAbility)(a)).execute(targets);
 		}
 		else
-			if(a instanceof HealingAbility)
-				if(isFoe() == firstPlayer){
+			if(a instanceof HealingAbility && a.getCastArea() == AreaOfEffect.SURROUND)
+				if(getFoe() == firstPlayer){
 					for (Champion m : firstPlayer.getTeam()) {
 						if(m != c && getDistance(m.getLocation(), c.getLocation()) <= range)
 							targets.add(m);
 					}
-					((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+					((HealingAbility)(a)).execute(targets);
 				}else{
 					for (Champion champ : secondPlayer.getTeam()) {
 						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= range)
 							targets.add(champ);
 					}
-					((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
+					((HealingAbility)(a)).execute(targets);
 				}
 	}
 
@@ -151,50 +164,11 @@ public class Game {
 		return false;
 	}
 
-<<<<<<< HEAD
-	public void castAbility(Ability a)throws NotEnoughResourcesException{
-		Champion c = this.getCurrentChampion();
-		int range = c.getAttackRange();
-		ArrayList<Damageable> targets = new ArrayList<Damageable>();
-		if(a instanceof DamagingAbility){
-			for(int i = range*-1; i < range;i++){
-				for(int j = range*-1; i < range; i++){
-					if(i != 0 && j != 0){
-						if(isDamageable(c.getLocation().y-i, c.getLocation().x-j)){
-							targets.add((Damageable)(board[c.getLocation().y-i][c.getLocation().x-j]));
-						}
-					}
-				}
-			}
-			((DamagingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
-		}
-		else
-			if(a instanceof HealingAbility){
-				for(int i = range*-1; i < range;i++){
-					for(int j = range*-1; i < range; i++){
-						if(i != 0 && j != 0){
-							if(board[c.getLocation().y-i][c.getLocation().x-j] instanceof Champion){
-								targets.add((Damageable)(board[c.getLocation().y-i][c.getLocation().x-j]));
-							}
-						} 
-					}
-				}
-				((HealingAbility)(a)).execute(targets);throw new NotEnoughResourcesException();
-			}
-=======
 	public static int getDistance(Point p1, Point p2){
 		return  (int)(Math.abs(p1.getX() - p2.getX()) - (int)(Math.abs(p1.getY() - p2.getY())));
->>>>>>> 323a434fbb615503c80de93162b82093b4a74d6a
-	}
-	
-	
-	public void castAbility(Ability a, Direction d)throws NotEnoughResourcesException{
-		if(a instanceof AreaofEffect.DIRECTIONAL ) {
-			
-		}
 	}
 
-	public Player isFoe(){
+	public Player getFoe(){
 		Champion c = getCurrentChampion();
 		if(firstPlayer.getTeam().contains(c))
 			return secondPlayer;
