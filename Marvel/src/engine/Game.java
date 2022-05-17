@@ -82,36 +82,21 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException{
+	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
-
+		
 		if(c.getCurrentActionPoints() < 2)
 			throw new NotEnoughResourcesException();
-			
-		switch(d){
-			case DOWN:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y-i][c.getLocation().x])));
-				}break;
-			case LEFT:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x-i])));
-				}break;
-			case RIGHT:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x+i])));
-				}break;
-			case UP:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y+i][c.getLocation().x])));
-				}
+		ArrayList temp = getSeq(range, d);
+		for (Object obj : temp) {
+			if(obj instanceof Cover || (obj instanceof Champion && isFoe())){
+				targets.add((Damageable)(obj));break;
+			}
 		}
+		
+		
 	}
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException{
@@ -242,6 +227,7 @@ public class Game {
 			return firstPlayer;
 	}
 
+<<<<<<< HEAD
 	public ArrayList getCovers(){
 		ArrayList<Cover> cov = new ArrayList<Cover>();
 		for (int i = 0; i < 5; i++){
@@ -255,6 +241,18 @@ public class Game {
 
 	public ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
 		ArrayList<Object> o = new ArrayList<Object>();
+=======
+	public Boolean isFoe(){
+		Champion c = getCurrentChampion();
+		if(firstPlayer.getTeam().contains(c)){
+			return false;
+		}else
+			return true;
+	}
+
+	public ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
+		ArrayList<Object> o = new ArrayList<>();
+>>>>>>> cb420941332ebfc639ed7fc3460d8bd73800937d
 		Champion c = getCurrentChampion();
 		Point t = c.getLocation();
 		for(int i = 1; i <= range; i++){
