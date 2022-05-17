@@ -96,17 +96,13 @@ public class Game {
 				targets.add((Damageable)(obj));break;
 			}
 		}
-		
-		if(c instanceof Hero){
-			//get location of enemy and compare it to board 
-		}
-			
+//get location of enemy and compare it to board 	
 		}
 // 		Heroes: they deal extra damage when attacking villains.
 // • Villains: they deal extra damage when attacking heroes.
 // • Anti-Heroes: when being attacked or attacking a hero or villain, the antihero will always
 // act as the opposite type. If attacking an antihero, damage is calculated normally.
-	}
+	
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException{
 		Champion c = this.getCurrentChampion();
