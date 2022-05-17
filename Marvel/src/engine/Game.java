@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 import exceptions.NotEnoughResourcesException;
@@ -96,7 +97,15 @@ public class Game {
 			}
 		}
 		
-		
+		if(c instanceof Hero){
+			//get location of enemy and compare it to board 
+		}
+			
+		}
+// 		Heroes: they deal extra damage when attacking villains.
+// • Villains: they deal extra damage when attacking heroes.
+// • Anti-Heroes: when being attacked or attacking a hero or villain, the antihero will always
+// act as the opposite type. If attacking an antihero, damage is calculated normally.
 	}
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException{
