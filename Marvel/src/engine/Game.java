@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 
 import exceptions.NotEnoughResourcesException;
@@ -83,13 +82,14 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException{
+	public void attack(Direction d) throws NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
-		
+
 		if(c.getCurrentActionPoints() < 2)
 			throw new NotEnoughResourcesException();
+<<<<<<< HEAD
 		ArrayList temp = getSeq(range, d);
 		for (Object obj : temp) {
 			if(obj instanceof Cover || (obj instanceof Champion && isFoe())){
@@ -103,6 +103,32 @@ public class Game {
 // • Anti-Heroes: when being attacked or attacking a hero or villain, the antihero will always
 // act as the opposite type. If attacking an antihero, damage is calculated normally.
 	
+=======
+			
+		switch(d){
+			case DOWN:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y-i][c.getLocation().x])));
+				}break;
+			case LEFT:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x-i])));
+				}break;
+			case RIGHT:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x+i])));
+				}break;
+			case UP:
+				for(int i = 1; i <= range; i++){
+					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
+						targets.add(((Damageable)(board[c.getLocation().y+i][c.getLocation().x])));
+				}
+		}
+	}
+>>>>>>> df60b02985981138f8a3f94771b7d1e000686ef6
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException{
 		Champion c = this.getCurrentChampion();
@@ -163,7 +189,7 @@ public class Game {
 				}
 	}
 
-	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException{
+	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException, CloneNotSupportedException{
 		Champion c = getCurrentChampion();
 		if(c.getCurrentActionPoints() <a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
@@ -184,7 +210,7 @@ public class Game {
 					}
 			}
 			((HealingAbility)(a)).execute(targets);
-		}else
+		}else 
 			if(a instanceof DamagingAbility){
 				if(board[y][x] instanceof Cover && dist <= range)
 					targets.add((Cover)(board[y][x]));
@@ -209,8 +235,11 @@ public class Game {
 									if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
 										targets.add((Champion)(board[y][x]));
 							((CrowdControlAbility)(a)).execute(targets);
-						}	
+						}
+					}
+				}
 	}
+	
 
 	// ----------------------------------------Helper Methods--------------------------------------
 
@@ -232,7 +261,6 @@ public class Game {
 			return firstPlayer;
 	}
 
-<<<<<<< HEAD
 	public ArrayList getCovers(){
 		ArrayList<Cover> cov = new ArrayList<Cover>();
 		for (int i = 0; i < 5; i++){
@@ -244,20 +272,32 @@ public class Game {
 		return cov;
 	}
 
-	public ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
-		ArrayList<Object> o = new ArrayList<Object>();
-=======
-	public Boolean isFoe(){
+	public Boolean isBonusDmg(Champion d){
 		Champion c = getCurrentChampion();
-		if(firstPlayer.getTeam().contains(c)){
-			return false;
-		}else
+		if(c instanceof Hero && d instanceof Villain)
 			return true;
+		else
+			if(c instanceof Villain && d instanceof Hero)
+				return true;
+		
+		if (c instanceof Villain && d instanceof AntiHero )
+			return true;
+		else
+			if(c instanceof AntiHero && d instanceof Villain)
+				return true;
+
+		if (c instanceof Hero && d instanceof AntiHero )
+			return true;
+		else
+			if(c instanceof AntiHero && d instanceof Hero )
+				return true;
+		else
+			return false;
 	}
+	
 
 	public ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
-		ArrayList<Object> o = new ArrayList<>();
->>>>>>> cb420941332ebfc639ed7fc3460d8bd73800937d
+		ArrayList<Object> o = new ArrayList<Object>();
 		Champion c = getCurrentChampion();
 		Point t = c.getLocation();
 		for(int i = 1; i <= range; i++){
