@@ -82,10 +82,14 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d){
+	public void attack(Direction d) throws NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
+
+		if(c.getCurrentActionPoints() < 2)
+			throw new NotEnoughResourcesException();
+			
 		switch(d){
 			case DOWN:
 				for(int i = 1; i <= range; i++){
