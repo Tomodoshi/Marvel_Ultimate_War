@@ -54,8 +54,8 @@ public class Game {
 
 	public void move(Direction d)throws UnallowedMovementException, NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
-		if(c.getCurrentActionPoints()<1)
-		throw new NotEnoughResourcesException("not enough action points to move");
+		if(c.getCurrentActionPoints()<1 && c.getCondition() == Condition.ROOTED)
+			throw new NotEnoughResourcesException("Not enough action points to move");
 		Point t = c.getLocation();// else needed ?
 		switch(d){
 			case DOWN:
@@ -116,7 +116,7 @@ public class Game {
 			throw new NotEnoughResourcesException();
 		int range = c.getAttackRange();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
-		if(a instanceof DamagingAbility && a.getCastArea() == AreaOfEffect.SURROUND){
+		if(a instanceof DamagingAbility){
 			if(getFoe() == firstPlayer){
 				for (Champion d : firstPlayer.getTeam()) {
 					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
@@ -130,9 +130,9 @@ public class Game {
 			((DamagingAbility)(a)).execute(targets);
 		}
 		else
-			if(a instanceof HealingAbility && a.getCastArea() == AreaOfEffect.SURROUND)
+			if(a instanceof HealingAbility)
 				if(getFoe() == firstPlayer){
-					for (Champion m : firstPlayer.getTeam()) {
+					for (Champion m : secondPlayer.getTeam()) {
 						if(m != c && getDistance(m.getLocation(), c.getLocation()) <= range)
 							targets.add(m);
 					}
@@ -144,16 +144,55 @@ public class Game {
 					}
 					((HealingAbility)(a)).execute(targets);
 				}
+			else
+				if(a instanceof CrowdControlAbility)
 	}
 
-	public void castAbility(Ability a, int x, int y){
+	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException{
+		Champion c = getCurrentChampion();
+		if(c.getCurrentActionPoints() <a.getRequiredActionPoints())
+			throw new NotEnoughResourcesException();
+		int dist = getDistance(c.getLocation(), new Point(y,x));
+		int range = c.getAttackRange();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		if(a instanceof HealingAbility){
 			if(board[y][x] instanceof Champion){
-				targets.add((Champion)(board[y][x]));
-				((HealingAbility)(a)).execute(targets);
+				if(getFoe() == firstPlayer){
+					if(secondPlayer.getTeam().contains(((Champion)(board[y][x]))) && dist <= range)
+						targets.add(((Champion)(board[y][x])));
+				}else
+					if(getFoe() == secondPlayer){
+						if(firstPlayer.getTeam().contains(((Champion)(board[y][x]))) && dist <= range)
+							targets.add(((Champion)(board[y][x])));
+					}
 			}
-		}
+			((HealingAbility)(a)).execute(targets);
+		}else
+			if(a instanceof DamagingAbility){
+				if(board[y][x] instanceof Cover && dist <= range)
+					targets.add((Cover)(board[y][x]));
+				else
+					if(board[y][x] instanceof Champion){
+						if(getFoe() == firstPlayer)
+							if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+								targets.add((Champion)(board[y][x]));
+
+						if(getFoe() == secondPlayer)
+							if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+									targets.add((Champion)(board[y][x]));
+				((DamagingAbility)(a)).execute(targets);
+			}else
+				if(a instanceof CrowdControlAbility){
+					if(board [y][x] instanceof Champion)
+						if(getFoe() == firstPlayer)
+							if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+								targets.add((Champion)(board[y][x]));
+
+						if(getFoe() == secondPlayer)
+							if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+								targets.add((Champion)(board[y][x]));
+					((CrowdControlAbility)(a)).execute(targets);
+				}
 	}
 
 	// ----------------------------------------Helper Methods--------------------------------------
@@ -174,6 +213,45 @@ public class Game {
 			return secondPlayer;
 		else
 			return firstPlayer;
+	}
+
+	public ArrayList getSeq(Champion w, Direction d) throws UnallowedMovementException{
+		ArrayList<Object> o = new ArrayList<>();
+		Champion c = getCurrentChampion();
+		Point t = c.getLocation();
+		for(int i = 1; i <= w.getAttackRange(); i++){
+			switch(d){
+				case DOWN:
+					t.y--;
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+						throw new UnallowedMovementException();
+					}else
+						o.add(board[t.y][t.x]);
+					break;
+				case LEFT:
+					t.x--;
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+						throw new UnallowedMovementException();
+					}else
+						o.add(board[t.y][t.x]);
+					break;
+				case RIGHT:
+					t.x++;
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+						throw new UnallowedMovementException();
+					}else
+						o.add(board[t.y][t.x]);
+					break;
+				case UP:
+					t.y++;
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+						throw new UnallowedMovementException();
+					}else
+						o.add(board[t.y][t.x]);
+					break;
+			}
+		}
+		return o;
 	}
 
 	// --------------------------------------------------------------------------------------------
