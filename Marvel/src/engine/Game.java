@@ -82,10 +82,14 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d){
+	public void attack(Direction d) throws NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
+
+		if(c.getCurrentActionPoints() < 2)
+			throw new NotEnoughResourcesException();
+			
 		switch(d){
 			case DOWN:
 				for(int i = 1; i <= range; i++){
@@ -110,16 +114,15 @@ public class Game {
 		}
 	}
 
-	public void castAbility(Ability a)throws NotEnoughResourcesException{
+	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException{
 		Champion c = this.getCurrentChampion();
-		if(c.getCurrentActionPoints() < a.getRequiredActionPoints())
+		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
-		int range = a.getCastRange();
-		ArrayList<Cover> cov = new ArrayList<Cover>();
-		for (int i = 0; i < 5; {
-			cov.add(cover);
 		}
+		int range = a.getCastRange();
+		ArrayList<Cover> cov = getCovers();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
+		
 		if(a instanceof DamagingAbility){
 			if(getFoe() == firstPlayer){
 				for (Champion d : firstPlayer.getTeam()) {
@@ -127,10 +130,17 @@ public class Game {
 						targets.add(d);
 				}
 			}else
-			for (Champion d : secondPlayer.getTeam()) {
-				if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
-					targets.add(d);
-			}
+				for (Champion d : secondPlayer.getTeam()) {
+					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+						targets.add(d);
+				}
+
+				for (Cover co: cov){
+					int dist =  getDistance(co.getLocation(), c.getLocation());
+					if(dist <= range)
+						targets.add(co);
+				}
+		((DamagingAbility)(a)).execute(targets);
 		}
 		else
 			if(a instanceof HealingAbility)
@@ -148,16 +158,30 @@ public class Game {
 					((HealingAbility)(a)).execute(targets);
 				}
 			else
-				if(a instanceof CrowdControlAbility)
+				if(a instanceof CrowdControlAbility){
+					if(getFoe() == firstPlayer){
+						for (Champion d : firstPlayer.getTeam()) {
+							if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+								targets.add(d);
+						}
+					}else
+						for (Champion d : secondPlayer.getTeam()) {
+							if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+								targets.add(d);
+						}
+					((CrowdControlAbility)(a)).execute(targets);
+				}
 	}
 
 	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException{
 		Champion c = getCurrentChampion();
-		if(c.getCurrentActionPoints() <a.getRequiredActionPoints())
+		if(c.getCurrentActionPoints() <a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
+		}
 		int dist = getDistance(c.getLocation(), new Point(y,x));
 		int range = a.getCastRange();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
+
 		if(a instanceof HealingAbility){
 			if(board[y][x] instanceof Champion){
 				if(getFoe() == firstPlayer){
@@ -174,7 +198,7 @@ public class Game {
 			if(a instanceof DamagingAbility){
 				if(board[y][x] instanceof Cover && dist <= range)
 					targets.add((Cover)(board[y][x]));
-				else
+				else{
 					if(board[y][x] instanceof Champion){
 						if(getFoe() == firstPlayer)
 							if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
@@ -183,19 +207,19 @@ public class Game {
 						if(getFoe() == secondPlayer)
 							if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
 									targets.add((Champion)(board[y][x]));
-				((DamagingAbility)(a)).execute(targets);
-			}else
-				if(a instanceof CrowdControlAbility){
-					if(board [y][x] instanceof Champion)
-						if(getFoe() == firstPlayer)
-							if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
-								targets.add((Champion)(board[y][x]));
+					((DamagingAbility)(a)).execute(targets);
+					}else
+						if(a instanceof CrowdControlAbility){
+							if(board [y][x] instanceof Champion)
+								if(getFoe() == firstPlayer)
+									if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+										targets.add((Champion)(board[y][x]));
 
-						if(getFoe() == secondPlayer)
-							if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
-								targets.add((Champion)(board[y][x]));
-					((CrowdControlAbility)(a)).execute(targets);
-				}
+								if(getFoe() == secondPlayer)
+									if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+										targets.add((Champion)(board[y][x]));
+							((CrowdControlAbility)(a)).execute(targets);
+						}	
 	}
 
 	// ----------------------------------------Helper Methods--------------------------------------
@@ -216,6 +240,17 @@ public class Game {
 			return secondPlayer;
 		else
 			return firstPlayer;
+	}
+
+	public ArrayList getCovers(){
+		ArrayList<Cover> cov = new ArrayList<Cover>();
+		for (int i = 0; i < 5; i++){
+			for(int j = 0; j < 5; j++){
+				if(board[j][i] instanceof Cover)
+					cov.add((Cover)(board[j][i]));
+			}
+		}
+		return cov;
 	}
 
 	public ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
