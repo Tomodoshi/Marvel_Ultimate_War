@@ -82,36 +82,21 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException{
+	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
-
+		
 		if(c.getCurrentActionPoints() < 2)
 			throw new NotEnoughResourcesException();
-			
-		switch(d){
-			case DOWN:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y-i][c.getLocation().x])));
-				}break;
-			case LEFT:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x-i])));
-				}break;
-			case RIGHT:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y][c.getLocation().x+i])));
-				}break;
-			case UP:
-				for(int i = 1; i <= range; i++){
-					if(isDamageable(c.getLocation().y-i, c.getLocation().x))
-						targets.add(((Damageable)(board[c.getLocation().y+i][c.getLocation().x])));
-				}
+		ArrayList temp = getSeq(range, d);
+		for (Object obj : temp) {
+			if(obj instanceof Cover || (obj instanceof Champion && isFoe())){
+				targets.add((Damageable)(obj));break;
+			}
 		}
+		
+		
 	}
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException{
@@ -219,36 +204,44 @@ public class Game {
 			return firstPlayer;
 	}
 
-	public ArrayList getSeq(Champion w, Direction d) throws UnallowedMovementException{
+	public Boolean isFoe(){
+		Champion c = getCurrentChampion();
+		if(firstPlayer.getTeam().contains(c)){
+			return false;
+		}else
+			return true;
+	}
+
+	public ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
 		ArrayList<Object> o = new ArrayList<>();
 		Champion c = getCurrentChampion();
 		Point t = c.getLocation();
-		for(int i = 1; i <= w.getAttackRange(); i++){
+		for(int i = 1; i <= range; i++){
 			switch(d){
 				case DOWN:
 					t.y--;
-					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
 					break;
 				case LEFT:
 					t.x--;
-					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
 					break;
 				case RIGHT:
 					t.x++;
-					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
 					break;
 				case UP:
 					t.y++;
-					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
