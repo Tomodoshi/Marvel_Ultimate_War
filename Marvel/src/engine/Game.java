@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import exceptions.LeaderNotCurrentException;
 import exceptions.NotEnoughResourcesException;
 import exceptions.UnallowedMovementException;
 import model.abilities.*;
@@ -222,6 +223,15 @@ public class Game {
 						}
 					}
 				}
+	}
+
+	public void useLeaderAbility() throws LeaderNotCurrentException{
+		Champion c = getCurrentChampion();
+		if(getFoe() == firstPlayer && secondPlayer.getTeam().contains(c))
+			if(c != secondPlayer.getLeader()){
+				throw new LeaderNotCurrentException();
+			}
+			
 	}
 	
 
