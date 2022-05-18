@@ -70,9 +70,13 @@ public class Game {
 
 	public void move(Direction d)throws UnallowedMovementException, NotEnoughResourcesException{
 		Champion c = this.getCurrentChampion();
-		if(c.getCurrentActionPoints()<1 && c.getCondition() == Condition.ROOTED)
+		if(c.getCurrentActionPoints() < 1){
 			throw new NotEnoughResourcesException("Not enough action points to move");
-		Point t = c.getLocation();// else needed ?
+		}
+		if(c.getCondition() == Condition.ROOTED){
+			throw new UnallowedMovementException();
+		}
+			Point t = c.getLocation();// else needed ?
 		switch(d){
 			case DOWN:
 				t.y--;
@@ -121,7 +125,24 @@ public class Game {
 				if(firstPlayer.getTeam().contains(temp.get(0))){
 					if(checkEffect()){
 						for (Effect e : ((Champion)(temp.get(0))).getAppliedEffects()) {
-							if(e instanceof )
+							if(e instanceof Dodge){
+								double var = Math.random();
+								if(var >= 0.5){
+									if(e.getDuration()-1 > 0){
+										e.setDuration(e.getDuration()-1);
+									}else{
+										((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+									}
+								}else{
+									targets.add((Damageable)(temp.get(0)));
+								}
+							}else if(e instanceof Shield){
+								if(e.getDuration() -1 > 0){
+									e.setDuration(e.getDuration() -1);
+								}else{
+									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+								}
+							}
 						}
 					}
 				}
@@ -449,28 +470,28 @@ public class Game {
 			switch(d){
 				case DOWN:
 					t.y--;
-					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
 					break;
 				case LEFT:
 					t.x--;
-					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
 					break;
 				case RIGHT:
 					t.x++;
-					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
 					break;
 				case UP:
 					t.y++;
-					if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+					if(board[t.y][t.x] != null &&(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
 						throw new UnallowedMovementException();
 					}else
 						o.add(board[t.y][t.x]);
