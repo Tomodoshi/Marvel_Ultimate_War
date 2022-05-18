@@ -203,6 +203,9 @@ public class Game {
 		if(a.getCurrentCooldown() > 0){
 			throw new AbilityUseException();
 		}
+		if(a.getManaCost() > c.getMana()){
+			throw new AbilityUseException();
+		}
 		int range = a.getCastRange();
 		ArrayList<Cover> cov = getCovers();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
@@ -298,6 +301,9 @@ public class Game {
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
 		}
+		if(a.getManaCost() > c.getMana()){
+			throw new AbilityUseException();
+		}
 		
 		if(!c.getAppliedEffects().isEmpty()){
 			for (Effect e : c.getAppliedEffects()) {
@@ -353,30 +359,30 @@ public class Game {
 				}
 				((HealingAbility)(a)).execute(targets);
 			}
-				else
-					if(a instanceof DamagingAbility){
-						for (Object o : getSeq(range, d)) {
-							if(o instanceof Cover){
-								targets.add((Cover)(o));
-							}else if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
-								if(checkEffect((Champion)(o))){
-									for (Effect e : ((Champion)(o)).getAppliedEffects()){
-										if(e instanceof Shield){
-											((Champion)(o)).getAppliedEffects().remove(e);										
-										}
+			else
+				if(a instanceof DamagingAbility){
+					for (Object o : getSeq(range, d)) {
+						if(o instanceof Cover){
+							targets.add((Cover)(o));
+						}else if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
+							if(checkEffect((Champion)(o))){
+								for (Effect e : ((Champion)(o)).getAppliedEffects()){
+									if(e instanceof Shield){
+										((Champion)(o)).getAppliedEffects().remove(e);										
 									}
-								}else{
-									targets.add((Champion)(o));
 								}
-						}
-						((DamagingAbility)(a)).execute(targets);
-					}else{
-						for (Object o : getSeq(range, d)) {
-							if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
+							}else{
 								targets.add((Champion)(o));
-						}
-						((CrowdControlAbility)(a)).execute(targets);
+							}
 					}
+					((DamagingAbility)(a)).execute(targets);
+				}else{
+					for (Object o : getSeq(range, d)) {
+						if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
+							targets.add((Champion)(o));
+					}
+					((CrowdControlAbility)(a)).execute(targets);
+				}
 				
 
 		for (Cover cover : covers) {
@@ -390,6 +396,16 @@ public class Game {
 		Champion c = getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
+		}
+		if(a.getManaCost() > c.getMana()){
+			throw new AbilityUseException();
+		}
+		if(!c.getAppliedEffects().isEmpty()){
+			for (Effect e : c.getAppliedEffects()) {
+				if(e instanceof Silence){
+					throw new AbilityUseException();
+				}
+			}
 		}
 		if(a.getCurrentCooldown() > 0){
 			throw new AbilityUseException();
@@ -417,19 +433,37 @@ public class Game {
 				else{
 					if(board[y][x] instanceof Champion){
 						if(getFoe() == firstPlayer)
-							if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
-								targets.add((Champion)(board[y][x]));
-
-						if(getFoe() == secondPlayer)
-							if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+							if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range){
+								if(checkEffect((Champion)(board[y][x]))){
+									for (Effect e : ((Champion)(board[y][x])).getAppliedEffects()) {
+										if(e instanceof Shield){
+											((Champion)(board[y][x])).getAppliedEffects().remove(e);
+										}
+									}
+								}else{
 									targets.add((Champion)(board[y][x]));
+								}
+							}
+						if(getFoe() == secondPlayer)
+							if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range){
+								if(checkEffect((Champion)(board[y][x]))){
+									for (Effect e : ((Champion)(board[y][x])).getAppliedEffects()) {
+										if(e instanceof Shield){
+											((Champion)(board[y][x])).getAppliedEffects().remove(e);
+										}
+									}
+								}else{
+									targets.add((Champion)(board[y][x]));
+								}
+							}
 					((DamagingAbility)(a)).execute(targets);
 					}else
 						if(a instanceof CrowdControlAbility){
 							if(board [y][x] instanceof Champion)
 								if(getFoe() == firstPlayer)
-									if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)
+									if(firstPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range){
 										targets.add((Champion)(board[y][x]));
+									}
 
 								if(getFoe() == secondPlayer)
 									if(secondPlayer.getTeam().contains((Champion)(board[y][x])) && dist <= range)

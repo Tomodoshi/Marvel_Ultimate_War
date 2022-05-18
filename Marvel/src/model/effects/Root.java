@@ -15,7 +15,7 @@ public class Root extends Effect {
 
 	@Override
 	public void remove(Champion c) {
-		c.setCondition(Condition.ACTIVE);
+		c.setCondition(Condition.INACTIVE);
 
 	}
 }
