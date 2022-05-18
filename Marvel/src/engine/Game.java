@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import exceptions.AbilityUseException;
 import exceptions.ChampionDisarmedException;
+import exceptions.InvalidTargetException;
 import exceptions.LeaderAbilityAlreadyUsedException;
 import exceptions.LeaderNotCurrentException;
 import exceptions.NotEnoughResourcesException;
@@ -187,7 +188,7 @@ public class Game {
 	}
 
 
-	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException{
+	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException, InvalidTargetException{
 		Champion c = this.getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
@@ -209,16 +210,35 @@ public class Game {
 		if(a instanceof DamagingAbility){
 			if(getFoe() == firstPlayer){
 				for (Champion d : firstPlayer.getTeam()) {
-					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
-						if(checkEffect(d))
-
-
-						targets.add(d);
+					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range){
+						if(checkEffect(d)){
+							for (Effect e : d.getAppliedEffects()) {
+								if(e instanceof Shield){
+									d.getAppliedEffects().remove(e);
+								}
+							}
+						}else{
+							targets.add(d);
+						}
+					}else{
+						throw new InvalidTargetException();
+					}
 				}
 			}else{
 				for (Champion d : secondPlayer.getTeam()) {
-					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
-						targets.add(d);
+					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range){
+						if(checkEffect(d)){
+							for (Effect e : d.getAppliedEffects()) {
+								if(e instanceof Shield){
+									d.getAppliedEffects().remove(e);
+								}
+							}
+						}else{
+							targets.add(d);
+						}
+					}else{
+						throw new InvalidTargetException();
+					}
 				}
 			}
 				for (Cover co: cov){
@@ -227,24 +247,26 @@ public class Game {
 						targets.add(co);
 				}
 
-		((DamagingAbility)(a)).execute(targets);
+			((DamagingAbility)(a)).execute(targets);
 		}
-		else
+		else{
 			if(a instanceof HealingAbility){
 				if(a.getCastArea() == AreaOfEffect.SELFTARGET){
 					targets.add((Damageable)(c));
-				if(getFoe() == firstPlayer){
+				}
+				else if(getFoe() == firstPlayer){
 					for (Champion m : secondPlayer.getTeam()) {
-						if(m != c && getDistance(m.getLocation(), c.getLocation()) <= range)
+						if(m != c && getDistance(m.getLocation(), c.getLocation()) <= range){
 							targets.add(m);
+						}
 					}
-					((HealingAbility)(a)).execute(targets);
-				}else{
+				}
+				else{
 					for (Champion champ : secondPlayer.getTeam()) {
-						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= range)
+						if(champ != c && getDistance(champ.getLocation(), c.getLocation()) <= range){
 							targets.add(champ);
+						}
 					}
-					((HealingAbility)(a)).execute(targets);
 				}
 			}
 			else{
@@ -263,6 +285,12 @@ public class Game {
 				((CrowdControlAbility)(a)).execute(targets);
 			}
 		}
+
+		for (Cover cover : covers) {
+			if(cover.getCurrentHP() == 0){
+				covers.remove(cover);
+			}
+		}
 	}
 
 	public void castAbility(Ability a, Direction d) throws NotEnoughResourcesException, UnallowedMovementException, CloneNotSupportedException, AbilityUseException{
@@ -270,6 +298,15 @@ public class Game {
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
 		}
+		
+		if(!c.getAppliedEffects().isEmpty()){
+			for (Effect e : c.getAppliedEffects()) {
+				if(e instanceof Silence){
+					throw new AbilityUseException();
+				}
+			}
+		}
+
 		if(a.getCurrentCooldown() > 0){
 			throw new AbilityUseException();
 		}
@@ -290,7 +327,15 @@ public class Game {
 							if(o instanceof Cover){
 								targets.add((Cover)(o));
 							}else if(o instanceof Champion && firstPlayer.getTeam().contains((Champion)(o)))
-								targets.add((Champion)(o));
+								if(checkEffect((Champion)(o))){
+									for (Effect e : ((Champion)(o)).getAppliedEffects()){
+										if(e instanceof Shield){
+											((Champion)(o)).getAppliedEffects().remove(e);										
+										}
+									}
+								}else{
+									targets.add((Champion)(o));
+								}
 						}
 						((DamagingAbility)(a)).execute(targets);
 					}else{
@@ -301,29 +346,44 @@ public class Game {
 						((CrowdControlAbility)(a)).execute(targets);
 					}
 		else
-		if(a instanceof HealingAbility){
-			for (Object o : getSeq(range, d)) {
-				if(o instanceof Champion && firstPlayer.getTeam().contains((Champion)(o)))
-					targets.add((Champion)(o));
-			}
-			((HealingAbility)(a)).execute(targets);
-		}
-			else
-				if(a instanceof DamagingAbility){
-					for (Object o : getSeq(range, d)) {
-						if(o instanceof Cover){
-							targets.add((Cover)(o));
-						}else if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
-							targets.add((Champion)(o));
-					}
-					((DamagingAbility)(a)).execute(targets);
-				}else{
-					for (Object o : getSeq(range, d)) {
-						if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
-							targets.add((Champion)(o));
-					}
-					((CrowdControlAbility)(a)).execute(targets);
+			if(a instanceof HealingAbility){
+				for (Object o : getSeq(range, d)) {
+					if(o instanceof Champion && firstPlayer.getTeam().contains((Champion)(o)))
+						targets.add((Champion)(o));
 				}
+				((HealingAbility)(a)).execute(targets);
+			}
+				else
+					if(a instanceof DamagingAbility){
+						for (Object o : getSeq(range, d)) {
+							if(o instanceof Cover){
+								targets.add((Cover)(o));
+							}else if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
+								if(checkEffect((Champion)(o))){
+									for (Effect e : ((Champion)(o)).getAppliedEffects()){
+										if(e instanceof Shield){
+											((Champion)(o)).getAppliedEffects().remove(e);										
+										}
+									}
+								}else{
+									targets.add((Champion)(o));
+								}
+						}
+						((DamagingAbility)(a)).execute(targets);
+					}else{
+						for (Object o : getSeq(range, d)) {
+							if(o instanceof Champion && secondPlayer.getTeam().contains((Champion)(o)))
+								targets.add((Champion)(o));
+						}
+						((CrowdControlAbility)(a)).execute(targets);
+					}
+				
+
+		for (Cover cover : covers) {
+			if(cover.getCurrentHP() == 0){
+				covers.remove(cover);
+			}
+		}
 	}
 
 	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException{
@@ -378,6 +438,11 @@ public class Game {
 						}
 					}
 				}
+		for (Cover cover : covers) {
+			if(cover.getCurrentHP() == 0){
+				covers.remove(cover);
+			}
+		}
 	}
 
 	public void useLeaderAbility() throws LeaderNotCurrentException, LeaderAbilityAlreadyUsedException{
