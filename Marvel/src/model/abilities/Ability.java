@@ -26,7 +26,7 @@ public abstract class Ability {
 
 	}
 	
-	public abstract void execute(ArrayList<Damageable> targets);
+	public abstract void execute(ArrayList<Damageable> targets) throws CloneNotSupportedException;
 
 	public String getName() {
 		return name;
