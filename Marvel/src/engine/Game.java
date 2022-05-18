@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayList;
 
 import exceptions.AbilityUseException;
@@ -102,7 +103,7 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException{
+	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException, InvalidAlgorithmParameterException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
@@ -144,7 +145,40 @@ public class Game {
 								}
 							}
 						}
+					}else{
+						targets.add((Damageable)(temp.get(0)));
 					}
+				}else{
+					throw new InvalidAlgorithmParameterException();
+				}
+			}else{
+				if(secondPlayer.getTeam().contains(temp.get(0))){
+					if(checkEffect()){
+						for (Effect e : ((Champion)(temp.get(0))).getAppliedEffects()) {
+							if(e instanceof Dodge){
+								double var = Math.random();
+								if(var >= 0.5){
+									if(e.getDuration()-1 > 0){
+										e.setDuration(e.getDuration()-1);
+									}else{
+										((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+									}
+								}else{
+									targets.add((Damageable)(temp.get(0)));
+								}
+							}else if(e instanceof Shield){
+								if(e.getDuration() -1 > 0){
+									e.setDuration(e.getDuration() -1);
+								}else{
+									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+								}
+							}
+						}
+					}else{
+						targets.add((Damageable)(temp.get(0)));
+					}
+				}else{
+					throw new InvalidAlgorithmParameterException();
 				}
 			}
 		}
