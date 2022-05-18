@@ -61,6 +61,8 @@ public abstract class Champion implements Comparable , Damageable {
 					if(e.getType() == EffectType.DEBUFF)
 						champion.appliedEffects.remove(e);
 				}
+				Effect e = new Embrace(2);
+				champion.getAppliedEffects().add(e);
 			}
 		else
 			if(this instanceof Villain)
