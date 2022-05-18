@@ -124,7 +124,7 @@ public class Game {
 		}else if(temp.get(0) instanceof Champion){
 			if(getFoe() == firstPlayer){
 				if(firstPlayer.getTeam().contains(temp.get(0))){
-					if(checkEffect()){
+					if(checkEffect((Champion)(temp.get(0)))){
 						for (Effect e : ((Champion)(temp.get(0))).getAppliedEffects()) {
 							if(e instanceof Dodge){
 								double var = Math.random();
@@ -153,7 +153,7 @@ public class Game {
 				}
 			}else{
 				if(secondPlayer.getTeam().contains(temp.get(0))){
-					if(checkEffect()){
+					if(checkEffect((Champion)(temp.get(0)))){
 						for (Effect e : ((Champion)(temp.get(0))).getAppliedEffects()) {
 							if(e instanceof Dodge){
 								double var = Math.random();
@@ -210,6 +210,8 @@ public class Game {
 			if(getFoe() == firstPlayer){
 				for (Champion d : firstPlayer.getTeam()) {
 					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+						if(checkEffect(d))
+
 
 						targets.add(d);
 				}
@@ -545,9 +547,8 @@ public class Game {
 		return o;
 	}
 
-	private Boolean checkEffect(){
-		Champion c = getCurrentChampion();
-		if(c.getAppliedEffects().isEmpty())
+	private static Boolean checkEffect(Champion s){
+		if(s.getAppliedEffects().isEmpty())
 			return true;
 		return false;
 	}
