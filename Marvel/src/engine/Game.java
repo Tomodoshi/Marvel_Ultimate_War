@@ -111,7 +111,7 @@ public class Game {
 		if(c.getCurrentActionPoints() < 2){
 			throw new NotEnoughResourcesException();
 		}
-		if(c.getAppliedEffects().isEmpty()){
+		if(!c.getAppliedEffects().isEmpty()){
 			for (Effect e : c.getAppliedEffects()) {
 				if(e instanceof Disarm){
 					throw new ChampionDisarmedException();
@@ -167,11 +167,7 @@ public class Game {
 									targets.add((Damageable)(temp.get(0)));
 								}
 							}else if(e instanceof Shield){
-								if(e.getDuration() -1 > 0){
-									e.setDuration(e.getDuration() -1);
-								}else{
-									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
-								}
+								((Champion)(temp.get(0))).getAppliedEffects().remove(e);
 							}
 						}
 					}else{
@@ -182,6 +178,12 @@ public class Game {
 				}
 			}
 		}
+
+		for (Cover cover : covers) {
+			if(cover.getCurrentHP() == 0){
+				covers.remove(cover);
+			}
+		}
 	}
 
 
@@ -189,6 +191,13 @@ public class Game {
 		Champion c = this.getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
+		}
+		if(!c.getAppliedEffects().isEmpty()){
+			for (Effect e : c.getAppliedEffects()) {
+				if(e instanceof Silence){
+					throw new AbilityUseException();
+				}
+			}
 		}
 		if(a.getCurrentCooldown() > 0){
 			throw new AbilityUseException();
@@ -201,6 +210,7 @@ public class Game {
 			if(getFoe() == firstPlayer){
 				for (Champion d : firstPlayer.getTeam()) {
 					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+
 						targets.add(d);
 				}
 			}else{
