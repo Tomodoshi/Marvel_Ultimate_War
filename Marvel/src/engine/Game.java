@@ -607,6 +607,29 @@ public class Game {
 		return covers;
 	}
 
+	private Boolean isBonusDmg(Champion d){
+		Champion c = getCurrentChampion();
+		if(c instanceof Hero && d instanceof Villain){
+			return true;
+		}else if(c instanceof Villain && d instanceof Hero){
+			return true;
+		}
+
+		if(c instanceof AntiHero && d instanceof Villain){
+			return true;
+		}else if(c instanceof Villain && d instanceof AntiHero){
+			return true;
+		}
+
+		if(c instanceof AntiHero && d instanceof Hero){
+			return true;
+		}else if(c instanceof Hero && d instanceof AntiHero){
+			return true;
+		}
+		
+		return false;
+	}
+
 	private ArrayList getSeq(int range, Direction d) throws UnallowedMovementException{
 		ArrayList<Object> o = new ArrayList<>();
 		Champion c = getCurrentChampion();
