@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import exceptions.AbilityUseException;
+import exceptions.ChampionDisarmedException;
 import exceptions.LeaderAbilityAlreadyUsedException;
 import exceptions.LeaderNotCurrentException;
 import exceptions.NotEnoughResourcesException;
@@ -96,27 +98,45 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException{
+	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
 		
-		if(c.getCurrentActionPoints() < 2)
+		if(c.getCurrentActionPoints() < 2){
 			throw new NotEnoughResourcesException();
+		}
+		if(c.getAppliedEffects().isEmpty()){
+			for (Effect e : c.getAppliedEffects()) {
+				if(e instanceof Disarm){
+					throw new ChampionDisarmedException();
+				}
+			}
+		}
 		ArrayList temp = getSeq(range, d);
-		for (Object obj : temp) {
-			if(obj instanceof Cover || (obj instanceof Champion && isFoe())){
-				targets.add((Damageable)(obj));
-				break;
+		if(temp.get(0) instanceof Cover){
+			targets.add((Damageable)(temp.get(0)));
+		}else if(temp.get(0) instanceof Champion){
+			if(getFoe() == firstPlayer){
+				if(firstPlayer.getTeam().contains(temp.get(0))){
+					if(checkEffect()){
+						for (Effect e : ((Champion)(temp.get(0))).getAppliedEffects()) {
+							if(e instanceof )
+						}
+					}
+				}
 			}
 		}
 	}
 
 
-	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException{
+	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException{
 		Champion c = this.getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
+		}
+		if(a.getCurrentCooldown() > 0){
+			throw new AbilityUseException();
 		}
 		int range = a.getCastRange();
 		ArrayList<Cover> cov = getCovers();
@@ -128,21 +148,24 @@ public class Game {
 					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
 						targets.add(d);
 				}
-			}else
+			}else{
 				for (Champion d : secondPlayer.getTeam()) {
 					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
 						targets.add(d);
 				}
-
+			}
 				for (Cover co: cov){
 					int dist =  getDistance(co.getLocation(), c.getLocation());
 					if(dist <= range)
 						targets.add(co);
 				}
+
 		((DamagingAbility)(a)).execute(targets);
 		}
 		else
-			if(a instanceof HealingAbility)
+			if(a instanceof HealingAbility){
+				if(a.getCastArea() == AreaOfEffect.SELFTARGET){
+					targets.add((Damageable)(c));
 				if(getFoe() == firstPlayer){
 					for (Champion m : secondPlayer.getTeam()) {
 						if(m != c && getDistance(m.getLocation(), c.getLocation()) <= range)
@@ -156,26 +179,32 @@ public class Game {
 					}
 					((HealingAbility)(a)).execute(targets);
 				}
-			else
-				if(a instanceof CrowdControlAbility){
-					if(getFoe() == firstPlayer){
-						for (Champion d : firstPlayer.getTeam()) {
-							if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
-								targets.add(d);
-						}
-					}else
-						for (Champion d : secondPlayer.getTeam()) {
-							if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
-								targets.add(d);
-						}
-					((CrowdControlAbility)(a)).execute(targets);
+			}
+			else{
+				if(getFoe() == firstPlayer){
+					for (Champion d : firstPlayer.getTeam()) {
+						if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+							targets.add(d);
+					}
 				}
+				else{
+					for (Champion d : secondPlayer.getTeam()) {
+						if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range)
+							targets.add(d);
+					}
+				}
+				((CrowdControlAbility)(a)).execute(targets);
+			}
+		}
 	}
 
-	public void castAbility(Ability a, Direction d) throws NotEnoughResourcesException, UnallowedMovementException, CloneNotSupportedException{
+	public void castAbility(Ability a, Direction d) throws NotEnoughResourcesException, UnallowedMovementException, CloneNotSupportedException, AbilityUseException{
 		Champion c = getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
+		}
+		if(a.getCurrentCooldown() > 0){
+			throw new AbilityUseException();
 		}
 
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
@@ -230,10 +259,13 @@ public class Game {
 				}
 	}
 
-	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException, CloneNotSupportedException{
+	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException{
 		Champion c = getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
 			throw new NotEnoughResourcesException();
+		}
+		if(a.getCurrentCooldown() > 0){
+			throw new AbilityUseException();
 		}
 		int dist = getDistance(c.getLocation(), new Point(y,x));
 		int range = a.getCastRange();
