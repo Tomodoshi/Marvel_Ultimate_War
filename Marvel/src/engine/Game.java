@@ -77,28 +77,28 @@ public class Game {
 		switch(d){
 			case DOWN:
 				t.y--;
-				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
+				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
 					c.setLocation(t);break;
 				}
 			case UP: 	
 				t.y++;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
+				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
 					c.setLocation(t);break;
 				}
 			case LEFT: 
 				t.x--;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
+				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
 					c.setLocation(t);break;
 				}
 			case RIGHT: 
 				t.x++;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
+				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
 					c.setLocation(t);break;
@@ -196,7 +196,6 @@ public class Game {
 		
 		c.setCurrentActionPoints(c.getCurrentActionPoints() - 2);
 	}
-
 
 	public void castAbility(Ability a)throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException, InvalidTargetException{
 		Champion c = this.getCurrentChampion();
