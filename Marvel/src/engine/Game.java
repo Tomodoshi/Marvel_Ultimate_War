@@ -100,7 +100,7 @@ public class Game {
 		if(c.getCondition() == Condition.ROOTED){
 			throw new UnallowedMovementException();
 		}
-			Point t = c.getLocation();
+		Point t = c.getLocation();
 		switch(d){
 			case DOWN:
 				t.y--;
