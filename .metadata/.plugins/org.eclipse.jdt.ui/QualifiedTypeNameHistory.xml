@@ -3,4 +3,5 @@
     <fullyQualifiedTypeName name="model.world.Damageable"/>
     <fullyQualifiedTypeName name="model.abilities.DamagingAbility"/>
     <fullyQualifiedTypeName name="model.abilities.AreaOfEffect"/>
+    <fullyQualifiedTypeName name="java.lang.Object"/>
 </qualifiedTypeNameHistroy>

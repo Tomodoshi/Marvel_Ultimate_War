@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
 import java.util.ArrayList;
 
 import exceptions.AbilityUseException;
@@ -128,7 +127,7 @@ public class Game {
 		}
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException, InvalidAlgorithmParameterException{
+	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException, InvalidTargetException{
 		Champion c = this.getCurrentChampion();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
@@ -181,7 +180,7 @@ public class Game {
 						}
 					}
 				}else{
-					throw new InvalidAlgorithmParameterException();
+					throw new InvalidTargetException();
 				}
 			}else{
 				if(secondPlayer.getTeam().contains(temp.get(0))){
@@ -541,10 +540,12 @@ public class Game {
 		ArrayList<Champion> targets = new ArrayList<Champion>();
 
 		if(getFoe() == firstPlayer){
-			if(c != secondPlayer.getLeader())
+			if(c != secondPlayer.getLeader()) {
 				throw new LeaderNotCurrentException();
-			if(secondLeaderAbilityUsed)
+			}
+			if(secondLeaderAbilityUsed) {
 				throw new LeaderAbilityAlreadyUsedException();
+			}
 			
 			if(c instanceof Hero){
 				targets = secondPlayer.getTeam();

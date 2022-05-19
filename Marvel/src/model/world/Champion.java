@@ -57,9 +57,12 @@ public abstract class Champion implements Comparable , Damageable {
 	public void useLeaderAbility(ArrayList<Champion> targets) {
 		if(this instanceof Hero)
 			for (Champion champion : targets) {
-				for (Effect  e : champion.getAppliedEffects()) {
-					if(e.getType() == EffectType.DEBUFF)
+				for (int i = 0; i < champion.getAppliedEffects().size(); i++) {
+					Effect e = champion.getAppliedEffects().get(i);
+					if(e.getType() == EffectType.DEBUFF) {
 						champion.appliedEffects.remove(e);
+						i--;
+					}
 				}
 				Effect e = new Embrace(2);
 				champion.getAppliedEffects().add(e);
