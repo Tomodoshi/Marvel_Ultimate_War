@@ -136,18 +136,26 @@ public class Game {
 										((Champion)(temp.get(0))).getAppliedEffects().remove(e);
 									}
 								}else{
-									targets.add((Damageable)(temp.get(0)));
+									if(isBonusDmg((Champion)(temp.get(0)))){
+										c.setAttackDamage((int)(c.getAttackDamage()*1.5));
+										targets.add((Damageable)(temp.get(0)));
+										c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+									}else{
+										targets.add((Damageable)(temp.get(0)));
+									}
 								}
 							}else if(e instanceof Shield){
-								if(e.getDuration() -1 > 0){
-									e.setDuration(e.getDuration() -1);
-								}else{
-									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
-								}
+								((Champion)(temp.get(0))).getAppliedEffects().remove(e);
 							}
 						}
 					}else{
-						targets.add((Damageable)(temp.get(0)));
+						if(isBonusDmg((Champion)(temp.get(0)))){
+							c.setAttackDamage((int)(c.getAttackDamage()*1.5));
+							targets.add((Damageable)(temp.get(0)));
+							c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+						}else{
+							targets.add((Damageable)(temp.get(0)));
+						}
 					}
 				}else{
 					throw new InvalidAlgorithmParameterException();
@@ -159,20 +167,28 @@ public class Game {
 							if(e instanceof Dodge){
 								double var = Math.random();
 								if(var >= 0.5){
-									if(e.getDuration()-1 > 0){
-										e.setDuration(e.getDuration()-1);
-									}else{
-										((Champion)(temp.get(0))).getAppliedEffects().remove(e);
-									}
+									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+								}
+								if(isBonusDmg((Champion)(temp.get(0)))){
+									c.setAttackDamage((int)(c.getAttackDamage()*1.5));
+									targets.add((Damageable)(temp.get(0)));
+									c.setAttackDamage((int)(c.getAttackDamage()/1.5));
 								}else{
 									targets.add((Damageable)(temp.get(0)));
 								}
-							}else if(e instanceof Shield){
+							}
+							if(e instanceof Shield){
 								((Champion)(temp.get(0))).getAppliedEffects().remove(e);
 							}
 						}
 					}else{
-						targets.add((Damageable)(temp.get(0)));
+						if(isBonusDmg((Champion)(temp.get(0)))){
+							c.setAttackDamage((int)(c.getAttackDamage()*1.5));
+							targets.add((Damageable)(temp.get(0)));
+							c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+						}else{
+							targets.add((Damageable)(temp.get(0)));
+						}
 					}
 				}else{
 					throw new InvalidAlgorithmParameterException();
@@ -547,12 +563,6 @@ public class Game {
 			for (Ability a : c.getAbilities()) {
 				a.setCurrentCooldown(a.getBaseCooldown());
 			}
-			for (Effect e : c.getAppliedEffects()) {
-				if(e.getDuration() == 0)
-					c.getAppliedEffects().remove(e);
-				else
-					e.setDuration(e.getDuration()-1);
-			}
 	}
 
 	private void prepareChampionTurns(){
@@ -561,6 +571,9 @@ public class Game {
 				turnOrder.insert(firstPlayer.getTeam().get(i));
 			if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
 				turnOrder.insert(secondPlayer.getTeam().get(i));
+		}
+		for (Ability a : ) {
+			
 		}
 	}
 	
@@ -626,7 +639,7 @@ public class Game {
 		}else if(c instanceof Hero && d instanceof AntiHero){
 			return true;
 		}
-		
+
 		return false;
 	}
 
