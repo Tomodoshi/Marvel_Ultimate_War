@@ -6,37 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import exceptions.AbilityUseException;
-import exceptions.ChampionDisarmedException;
-import exceptions.InvalidTargetException;
-import exceptions.LeaderAbilityAlreadyUsedException;
-import exceptions.LeaderNotCurrentException;
-import exceptions.NotEnoughResourcesException;
-import exceptions.UnallowedMovementException;
-import model.abilities.Ability;
-import model.abilities.AreaOfEffect;
-import model.abilities.CrowdControlAbility;
-import model.abilities.DamagingAbility;
-import model.abilities.HealingAbility;
-import model.effects.Disarm;
-import model.effects.Dodge;
-import model.effects.Effect;
-import model.effects.Embrace;
-import model.effects.PowerUp;
-import model.effects.Root;
-import model.effects.Shield;
-import model.effects.Shock;
-import model.effects.Silence;
-import model.effects.SpeedUp;
-import model.effects.Stun;
-import model.world.AntiHero;
-import model.world.Champion;
-import model.world.Condition;
-import model.world.Cover;
-import model.world.Damageable;
-import model.world.Direction;
-import model.world.Hero;
-import model.world.Villain;
+import exceptions.*;
+import model.abilities.*;
+import model.effects.*;
+import model.world.*;
 
 public class Game {
 	private Player firstPlayer;
@@ -98,37 +71,37 @@ public class Game {
 			throw new NotEnoughResourcesException("Not enough action points to move");
 		}
 		if(c.getCondition() == Condition.ROOTED){
-			throw new UnallowedMovementException();
+			throw new UnallowedMovementException("Champion is Rooted");
 		}
 			Point t = c.getLocation();
 		switch(d){
 			case DOWN:
 				t.y--;
-				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
-					c.setLocation(t);break;
-				}else {
+				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
+				}else {
+					c.setLocation(t);break;
 				}
-			case UP: 
+			case UP: 	
 				t.y++;
-				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
-					c.setLocation(t);break;
-				}else {
+				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
+				}else {
+					c.setLocation(t);break;
 				}
 			case LEFT: 
 				t.x--;
-				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
-					c.setLocation(t);break;
-				}else {
+				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
+				}else {
+					c.setLocation(t);break;
 				}
 			case RIGHT: 
 				t.x++;
-				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
-					c.setLocation(t);break;
-				}else {
+				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
+				}else {
+					c.setLocation(t);break;
 				}
 		}
 		
@@ -140,15 +113,16 @@ public class Game {
 		int range = c.getAttackRange();
 		
 		if(c.getCurrentActionPoints() < 2){
-			throw new NotEnoughResourcesException();
+			throw new NotEnoughResourcesException("Not enough action points");
 		}
 		if(!c.getAppliedEffects().isEmpty()){
 			for (Effect e : c.getAppliedEffects()) {
 				if(e instanceof Disarm){
-					throw new ChampionDisarmedException();
+					throw new ChampionDisarmedException("Champion is disarmed");
 				}
 			}
 		}
+		
 		ArrayList temp = getSeq(range, d);
 		if(!temp.isEmpty() && temp.get(0) instanceof Cover){
 			((Cover)(temp.get(0))).setCurrentHP(((Cover)(temp.get(0))).getCurrentHP()- c.getAttackDamage());
@@ -160,9 +134,7 @@ public class Game {
 							Effect e = ((Champion)(temp.get(0))).getAppliedEffects().get(i);
 							if(e instanceof Dodge){
 								double var = Math.random();
-								if(var >= 0.5){
-									
-								}else{
+								if(var < 0.5){
 									if(isBonusDmg((Champion)(temp.get(0)))){
 										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 									}else{
@@ -182,7 +154,7 @@ public class Game {
 						}
 					}
 				}else{
-					throw new InvalidTargetException();
+					throw new InvalidTargetException("Friendly fire isn't on");
 				}
 			}else{
 				if(secondPlayer.getTeam().contains(temp.get(0))){
@@ -191,10 +163,7 @@ public class Game {
 							Effect e = ((Champion)(temp.get(0))).getAppliedEffects().get(i);
 							if(e instanceof Dodge){
 								double var = Math.random();
-								if(var >= 0.5){
-									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
-									i--;
-								}else{
+								if(var < 0.5){
 									if(isBonusDmg((Champion)(temp.get(0)))){
 										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 									}else{
@@ -629,10 +598,16 @@ public class Game {
 
 	private void prepareChampionTurns(){
 		for(int i = 0; i < 3; i++){
-			if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
-				turnOrder.insert(firstPlayer.getTeam().get(i));
-			if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT)
-				turnOrder.insert(secondPlayer.getTeam().get(i));
+			if(!firstPlayer.getTeam().isEmpty()){
+				if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT){
+					turnOrder.insert(firstPlayer.getTeam().get(i));
+				}
+			}
+			if(!secondPlayer.getTeam().isEmpty()){
+				if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT){
+					turnOrder.insert(secondPlayer.getTeam().get(i));
+				}
+			}
 		}
 	}
 	
@@ -734,7 +709,7 @@ public class Game {
 	}
 
 	private static Boolean checkEffect(Champion s){
-		if(s.getAppliedEffects().isEmpty())
+		if(!s.getAppliedEffects().isEmpty())
 			return true;
 		return false;
 	}
@@ -927,6 +902,14 @@ public class Game {
 
 	public static int getBoardwidth() {
 		return BOARDWIDTH;
+	}
+
+	public static void main(String[] args) throws IOException {
+		Player player1 = new Player("Nour");
+		Player player2 = new Player("Nour1");
+		Game g = new Game(player1, player2);
+		loadChampions("Home/Desktop/Game/Marvel/Champions");
+		loadAbilities("Home/Desktop/Game/Marvel/Abilities");throw new IOException();
 	}
 
 }
