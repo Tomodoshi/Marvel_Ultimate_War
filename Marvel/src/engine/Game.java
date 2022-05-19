@@ -61,6 +61,8 @@ public class Game {
 		covers = new ArrayList<Cover>();
 		placeChampions();
 		placeCovers();
+		prepareChampionTurns();
+		prepCoversMethod();
 	}
 
 	public Champion getCurrentChampion(){
@@ -98,38 +100,43 @@ public class Game {
 		if(c.getCondition() == Condition.ROOTED){
 			throw new UnallowedMovementException();
 		}
-			Point t = c.getLocation();// else needed ?
+			Point t = c.getLocation();
 		switch(d){
 			case DOWN:
 				t.y--;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] != null  ){
-					throw new UnallowedMovementException();
-				}else
+				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
 					c.setLocation(t);break;
+				}else {
+					throw new UnallowedMovementException();
+				}
 			case UP: 
 				t.y++;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] != null ){
-					throw new UnallowedMovementException();
-				}else
+				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
 					c.setLocation(t);break;
+				}else {
+					throw new UnallowedMovementException();
+				}
 			case LEFT: 
 				t.x--;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] != null ){
-					throw new UnallowedMovementException();
-				}else
+				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
 					c.setLocation(t);break;
+				}else {
+					throw new UnallowedMovementException();
+				}
 			case RIGHT: 
 				t.x++;
-				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] != null ){
-					throw new UnallowedMovementException();
-				}else
+				if(!((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) &&board[t.y][t.x] instanceof Object)){
 					c.setLocation(t);break;
+				}else {
+					throw new UnallowedMovementException();
+				}
 		}
+		
+		c.setCurrentActionPoints(c.getCurrentActionPoints() - 1);
 	}
 
 	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException, InvalidTargetException{
 		Champion c = this.getCurrentChampion();
-		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = c.getAttackRange();
 		
 		if(c.getCurrentActionPoints() < 2){
@@ -143,9 +150,9 @@ public class Game {
 			}
 		}
 		ArrayList temp = getSeq(range, d);
-		if(temp.size() > 0 && temp.get(0) instanceof Cover){
-			targets.add((Damageable)(temp.get(0)));
-		}else if(temp.size() > 0 && temp.get(0) instanceof Champion){
+		if(!temp.isEmpty() && temp.get(0) instanceof Cover){
+			((Cover)(temp.get(0))).setCurrentHP(((Cover)(temp.get(0))).getCurrentHP()- c.getAttackDamage());
+		}else if(!temp.isEmpty() && temp.get(0) instanceof Champion){
 			if(getFoe() == firstPlayer){
 				if(firstPlayer.getTeam().contains(temp.get(0))){
 					if(checkEffect((Champion)(temp.get(0)))){
@@ -154,15 +161,12 @@ public class Game {
 							if(e instanceof Dodge){
 								double var = Math.random();
 								if(var >= 0.5){
-									((Champion)(temp.get(0))).getAppliedEffects().remove(e);
-									i--;
+									
 								}else{
 									if(isBonusDmg((Champion)(temp.get(0)))){
-										c.setAttackDamage((int)(c.getAttackDamage()*1.5));
-										targets.add((Damageable)(temp.get(0)));
-										c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 									}else{
-										targets.add((Damageable)(temp.get(0)));
+										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
 									}
 								}
 							}else if(e instanceof Shield){
@@ -172,11 +176,9 @@ public class Game {
 						}
 					}else{
 						if(isBonusDmg((Champion)(temp.get(0)))){
-							c.setAttackDamage((int)(c.getAttackDamage()*1.5));
-							targets.add((Damageable)(temp.get(0)));
-							c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 						}else{
-							targets.add((Damageable)(temp.get(0)));
+							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
 						}
 					}
 				}else{
@@ -194,11 +196,9 @@ public class Game {
 									i--;
 								}else{
 									if(isBonusDmg((Champion)(temp.get(0)))){
-										c.setAttackDamage((int)(c.getAttackDamage()*1.5));
-										targets.add((Damageable)(temp.get(0)));
-										c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 									}else{
-										targets.add((Damageable)(temp.get(0)));
+										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
 									}
 								}
 							}else if(e instanceof Shield){
@@ -208,11 +208,9 @@ public class Game {
 						}
 					}else{
 						if(isBonusDmg((Champion)(temp.get(0)))){
-							c.setAttackDamage((int)(c.getAttackDamage()*1.5));
-							targets.add((Damageable)(temp.get(0)));
-							c.setAttackDamage((int)(c.getAttackDamage()/1.5));
+							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 						}else{
-							targets.add((Damageable)(temp.get(0)));
+							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
 						}
 					}
 				}
@@ -226,6 +224,8 @@ public class Game {
 				i--;
 			}
 		}
+		
+		c.setCurrentActionPoints(c.getCurrentActionPoints() - 2);
 	}
 
 
@@ -342,6 +342,9 @@ public class Game {
 				i--;
 			}
 		}
+		a.setCurrentCooldown(a.getBaseCooldown());
+		c.setMana(c.getMana() - a.getManaCost());
+		c.setCurrentActionPoints(c.getCurrentActionPoints() - a.getRequiredActionPoints());
 	}
 
 	public void castAbility(Ability a, Direction d) throws NotEnoughResourcesException, UnallowedMovementException, CloneNotSupportedException, AbilityUseException{
@@ -440,6 +443,10 @@ public class Game {
 				i--;
 			}
 		}
+
+		a.setCurrentCooldown(a.getBaseCooldown());
+		c.setMana(c.getMana() - a.getManaCost());
+		c.setCurrentActionPoints(c.getCurrentActionPoints() - a.getRequiredActionPoints());
 	}
 
 	public void castAbility(Ability a, int x, int y) throws NotEnoughResourcesException, CloneNotSupportedException, AbilityUseException{
@@ -533,16 +540,20 @@ public class Game {
 				i--;
 			}
 		}
+		a.setCurrentCooldown(a.getBaseCooldown());
+		c.setMana(c.getMana() - a.getManaCost());
+		c.setCurrentActionPoints(c.getCurrentActionPoints() - a.getRequiredActionPoints());
 	}
 
 	public void useLeaderAbility() throws LeaderNotCurrentException, LeaderAbilityAlreadyUsedException{
 		Champion c = getCurrentChampion();
 		ArrayList<Champion> targets = new ArrayList<Champion>();
 
+		if(c != firstPlayer.getLeader() && c != secondPlayer.getLeader())
+			throw new LeaderNotCurrentException();
+		
 		if(getFoe() == firstPlayer){
-			if(c != secondPlayer.getLeader()) {
-				throw new LeaderNotCurrentException();
-			}
+
 			if(secondLeaderAbilityUsed) {
 				throw new LeaderAbilityAlreadyUsedException();
 			}
@@ -566,8 +577,6 @@ public class Game {
 			}
 			secondLeaderAbilityUsed = true;
 		}else{
-			if(c != firstPlayer.getLeader())
-				throw new LeaderNotCurrentException();
 			if(firstLeaderAbilityUsed)
 				throw new LeaderAbilityAlreadyUsedException();
 			
