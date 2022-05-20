@@ -128,8 +128,8 @@ public class Game {
 			}
 		}
 
-		ArrayList temp = getSeq(range, d);
-		if (!temp.isEmpty() && temp.get(0) instanceof Cover) {
+ 		ArrayList<Damageable> temp = getSeq(range, d);
+ 		if (!temp.isEmpty() && temp.get(0) instanceof Cover) {
 			((Cover) (temp.get(0))).setCurrentHP(((Cover) (temp.get(0))).getCurrentHP() - c.getAttackDamage());
 		} else if (!temp.isEmpty() && temp.get(0) instanceof Champion) {
 			if (getFoe() == firstPlayer) {
@@ -656,12 +656,6 @@ public class Game {
 
 	// ----------------------------------------Helper
 	// Methods--------------------------------------
-
-	private Boolean isDamageable(int y, int x) {
-		if (board[y][x] instanceof Champion || board[y][x] instanceof Cover)
-			return true;
-		return false;
-	}
 
 	private static int getDistance(Point p1, Point p2) {
 		return (int) (Math.abs(p1.getX() - p2.getX()) - (int) (Math.abs(p1.getY() - p2.getY())));
