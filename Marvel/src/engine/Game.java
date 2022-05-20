@@ -90,7 +90,7 @@ public class Game {
 					c.setLocation(t);break;
 				}
 			case LEFT: 
-				t.x--;
+				t.y++;
 				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
@@ -108,7 +108,7 @@ public class Game {
 		c.setCurrentActionPoints(c.getCurrentActionPoints() - 1);
 	}
 
-	public void atttack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException, InvalidTargetException{
+	public void attack(Direction d) throws NotEnoughResourcesException, UnallowedMovementException, ChampionDisarmedException, InvalidTargetException{
 
 		Champion c = this.getCurrentChampion();
 		int range = c.getAttackRange();
@@ -127,32 +127,37 @@ public class Game {
 		ArrayList<Damageable> temp = getSeq(range, d);
 
 		if(!temp.isEmpty() && temp.get(0) instanceof Cover){
+			System.out.println(0);
 			((Cover)(temp.get(0))).setCurrentHP(((Cover)(temp.get(0))).getCurrentHP()- c.getAttackDamage());
 		}else if(!temp.isEmpty() && temp.get(0) instanceof Champion){
+			Champion s = (Champion)(temp.get(0));
+			System.out.println(1);
 			if(getFoe() == firstPlayer){
 				if(firstPlayer.getTeam().contains(temp.get(0))){
-					if(checkEffect((Champion)(temp.get(0)))){
-						for (int i = 0; i < ((Champion)(temp.get(0))).getAppliedEffects().size(); i++) {
-							Effect e = ((Champion)(temp.get(0))).getAppliedEffects().get(i);
+					System.out.println(1.1);
+					if(checkEffect(s)){
+						System.out.println(2);
+						for (int i = 0; i < s.getAppliedEffects().size(); i++) {
+							Effect e = s.getAppliedEffects().get(i);
 							if(e instanceof Dodge){
 								double var = Math.random();
 								if(var < 0.5){
-									if(isBonusDmg((Champion)(temp.get(0)))){
-										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
+									if(isBonusDmg(s)){
+										s.setCurrentHP(s.getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 									}else{
-										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
+										s.setCurrentHP(s.getCurrentHP() - (int)(c.getAttackDamage()));
 									}
 								}
 							}else if(e instanceof Shield){
-								((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+								s.getAppliedEffects().remove(e);
 								i--;
 							}
 						}
 					}else{
-						if(isBonusDmg((Champion)(temp.get(0)))){
-							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
+						if(isBonusDmg(s)){
+							s.setCurrentHP(s.getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
 						}else{
-							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
+							s.setCurrentHP(s.getCurrentHP() - (int)(c.getAttackDamage()));
 						}
 					}
 				}else{
@@ -160,46 +165,54 @@ public class Game {
 				}
 			}else{
 				if(secondPlayer.getTeam().contains(temp.get(0))){
-					if(checkEffect((Champion)(temp.get(0)))){
-						for (int i = 0; i < ((Champion)(temp.get(0))).getAppliedEffects().size(); i++) {
-							Effect e = ((Champion)(temp.get(0))).getAppliedEffects().get(i);
+					System.out.println(10.1);
+					if(checkEffect(s)){
+						System.out.println(11);
+						for (int i = 0; i < s.getAppliedEffects().size(); i++) {
+							Effect e = s.getAppliedEffects().get(i);
 							if(e instanceof Dodge){
 								double var = Math.random();
 								if(var < 0.5){
-									if(isBonusDmg((Champion)(temp.get(0)))){
-										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
+									if(isBonusDmg(s)){
+										int var1 = (int)(c.getAttackDamage()*1.5);
+										s.setCurrentHP(s.getCurrentHP() - var1);
 									}else{
-										((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
+										s.setCurrentHP(s.getCurrentHP() - c.getAttackDamage());
 									}
 								}
 							}else if(e instanceof Shield){
-								((Champion)(temp.get(0))).getAppliedEffects().remove(e);
+								s.getAppliedEffects().remove(e);
 								i--;
 							}
 						}
 					}else{
-						if(isBonusDmg((Champion)(temp.get(0)))){
-							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
+						System.out.println(13);
+						if(isBonusDmg(s)){
+							System.out.println(14);
+							s.setCurrentHP(s.getCurrentHP() - (int)(c.getAttackDamage() * 1.5));
+							System.out.println(14.5);
 						}else{
-							((Champion)(temp.get(0))).setCurrentHP(((Champion)(temp.get(0))).getCurrentHP() - (int)(c.getAttackDamage()));
+							System.out.println(15);
+							s.setCurrentHP(s.getCurrentHP() - (int)(c.getAttackDamage()));
 						}
 					}
 				}
 			}
 		}
-
-		for (int i = 0; i< covers.size(); i++) {
-			Cover cov = covers.get(i);
-			if(cov.getCurrentHP() == 0){
-				covers.remove(cov);
-				i--;
+		
+		if(!temp.isEmpty() && (temp.get(0)).getCurrentHP() == 0){
+			Point t = (temp.get(0)).getLocation();
+			board [t.y][t.x] = null;
+			if(temp.get(0) instanceof Champion) {
+				firstPlayer.getTeam().remove(temp.get(0));
+				secondPlayer.getTeam().remove(temp.get(0));
 			}
 		}
 		
 		c.setCurrentActionPoints(c.getCurrentActionPoints() - 2);
 	}
 
-	public void attack(Direction d) throws NotEnoughResourcesException, ChampionDisarmedException, InvalidTargetException{
+	public void atttack(Direction d) throws NotEnoughResourcesException, ChampionDisarmedException, InvalidTargetException{
 		Champion c = getCurrentChampion();
 		if(c.getCurrentActionPoints() < 2){
 			throw new NotEnoughResourcesException();
@@ -700,12 +713,12 @@ public class Game {
 	private void prepareChampionTurns(){
 		for(int i = 0; i < 3; i++){
 			if(!firstPlayer.getTeam().isEmpty()){
-				if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT){
+				if(firstPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && firstPlayer.getTeam().get(i).getCurrentHP() != 0){
 					turnOrder.insert(firstPlayer.getTeam().get(i));
 				}
 			}
 			if(!secondPlayer.getTeam().isEmpty()){
-				if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT){
+				if(secondPlayer.getTeam().get(i).getCondition() != Condition.KNOCKEDOUT && secondPlayer.getTeam().get(i).getCurrentHP() != 0){
 					turnOrder.insert(secondPlayer.getTeam().get(i));
 				}
 			}
@@ -768,7 +781,7 @@ public class Game {
 		ArrayList<Damageable> o = new ArrayList<>();
 		Champion c = getCurrentChampion();
 		Point t = c.getLocation();
-		for(int i = 1; i < range; i++){
+		for(int i = 0; i < range; i++){
 			switch(d){
 				case DOWN:
 					t.y--;
@@ -776,9 +789,17 @@ public class Game {
 						o.add((Damageable)(board[t.y][t.x]));
 					break;
 				case LEFT:
-					t.x--;
-					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.y][t.x] instanceof Champion || board[t.y][t.x] instanceof Cover))
-						o.add((Damageable)(board[t.y][t.x]));
+					t.y++;
+					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
+						if(board[t.y][t.x] instanceof Champion) {
+							o.add((Damageable)(board[t.y][t.x]));
+							return o;
+						}else {
+							if(board[t.y][t.x] instanceof Cover) {
+								o.add((Damageable)(board[t.y][t.x]));
+							}
+						}
+					}
 					break;
 				case RIGHT:
 					t.x++;

@@ -57,7 +57,7 @@ public abstract class Champion implements Comparable , Damageable {
 	public abstract void useLeaderAbility(ArrayList<Champion> targets);
 	
 	public int getCurrentHP() {
-		return currentHP;
+		return this.currentHP;
 	}
 
 	public void setCurrentHP(int currentHP) {
@@ -78,7 +78,8 @@ public abstract class Champion implements Comparable , Damageable {
 	}
 
 	public int getAttackDamage() {
-		return attackDamage;
+		System.out.println(14.1);
+		return this.attackDamage;
 	}
 
 	public void setAttackDamage(int attackDamage) {

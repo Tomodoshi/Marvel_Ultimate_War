@@ -2,7 +2,6 @@ package model.world;
 
 import java.util.ArrayList;
 
-import model.effects.Effect;
 import model.effects.Stun;
 
 
