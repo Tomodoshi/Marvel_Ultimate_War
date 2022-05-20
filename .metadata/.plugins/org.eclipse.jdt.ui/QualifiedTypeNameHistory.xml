@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="model.world.Damageable"/>
-    <fullyQualifiedTypeName name="model.abilities.DamagingAbility"/>
-    <fullyQualifiedTypeName name="model.abilities.AreaOfEffect"/>
-    <fullyQualifiedTypeName name="java.lang.Object"/>
-    <fullyQualifiedTypeName name="exceptions.LeaderNotCurrentException"/>
-    <fullyQualifiedTypeName name="exceptions.UnallowedMovementException"/>
-</qualifiedTypeNameHistroy>
