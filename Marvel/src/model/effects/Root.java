@@ -10,12 +10,14 @@ public class Root extends Effect {
 
 	@Override
 	public void apply(Champion c) {
-		c.setCondition(Condition.ROOTED);
+		if(!(c.getCondition() == Condition.INACTIVE)){
+			c.setCondition(Condition.ROOTED);
+		}
 	}
 
 	@Override
 	public void remove(Champion c) {
-		c.setCondition(Condition.INACTIVE);
+		c.setCondition(Condition.ACTIVE);
 
 	}
 }

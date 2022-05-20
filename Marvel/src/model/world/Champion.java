@@ -54,33 +54,7 @@ public abstract class Champion implements Comparable , Damageable {
 			return 0;
 	}
 	
-	public void useLeaderAbility(ArrayList<Champion> targets) {
-		if(this instanceof Hero)
-			for (Champion champion : targets) {
-				for (int i = 0; i < champion.getAppliedEffects().size(); i++) {
-					Effect e = champion.getAppliedEffects().get(i);
-					if(e.getType() == EffectType.DEBUFF) {
-						champion.appliedEffects.remove(e);
-						i--;
-					}
-				}
-				Effect e = new Embrace(2);
-				champion.getAppliedEffects().add(e);
-			}
-		else
-			if(this instanceof Villain)
-				for (Champion champion : targets) {
-					float temp = champion.getCurrentHP()/champion.getMaxHP();
-					if(temp < 0.3)
-						champion.setCurrentHP(0);
-				}
-			else
-				if(this instanceof AntiHero) 
-					for (Champion champion : targets) {
-						Stun e = new Stun(2);
-						champion.appliedEffects.add(e); //except team leaders
-					}
-	}
+	public abstract void useLeaderAbility(ArrayList<Champion> targets);
 	
 	public int getCurrentHP() {
 		return currentHP;
