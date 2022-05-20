@@ -73,35 +73,38 @@ public class Game {
 		if(c.getCondition() == Condition.ROOTED){
 			throw new UnallowedMovementException("Champion is Rooted");
 		}
-		Point t = c.getLocation();
 		switch(d){
 			case DOWN:
-				t.y--;
-				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
+				Point t = c.getLocation();
+				t.x--;
+				if((t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.x][t.y] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
 					c.setLocation(t);break;
 				}
-			case UP: 	
-				t.y++;
-				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
+			case UP:
+				Point t1 = c.getLocation();
+				t1.x++;
+				if((t1.x >= 5 || t1.x < 0 || t1.y >= 5 || t1.y < 0) || (board[t1.x][t1.y] instanceof Object)){
 					throw new UnallowedMovementException();
 				}else {
-					c.setLocation(t);break;
+					c.setLocation(t1);break;
 				}
-			case LEFT: 
-				t.y++;
-				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
+			case LEFT:
+				Point t2 = c.getLocation();
+				t2.y--;
+				if((t2.x >= 5 || t2.x < 0 || t2.y >= 5 || t2.y < 0) || board[t2.x][t2.y] instanceof Object){
 					throw new UnallowedMovementException();
 				}else {
-					c.setLocation(t);break;
+					c.setLocation(t2);break;
 				}
 			case RIGHT: 
-				t.x++;
-				if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) || board[t.y][t.x] instanceof Object){
+				Point t3 = c.getLocation();
+				t3.y++;
+				if((t3.x >= 5 || t3.x < 0 || t3.y >= 5 || t3.y < 0) || (board[t3.x][t3.y] instanceof Object)){
 					throw new UnallowedMovementException();
 				}else {
-					c.setLocation(t);break;
+					c.setLocation(t3);break;
 				}
 		}
 		
