@@ -17,7 +17,20 @@ public class Root extends Effect {
 
 	@Override
 	public void remove(Champion c) {
-		c.setCondition(Condition.ACTIVE);
-
+		if(c.getCondition() != Condition.INACTIVE) {
+			int counter = 0;
+			for (int i = 0; i <= c.getAppliedEffects().size(); i++) {
+				Effect e = c.getAppliedEffects().get(i);
+				if(e instanceof Root) {
+					counter++;
+				}
+			}
+			if(counter <= 1) {
+				c.setCondition(Condition.ACTIVE);
+				
+			}else {
+				c.setCondition(Condition.ROOTED);
+			}
+		}
 	}
 }
