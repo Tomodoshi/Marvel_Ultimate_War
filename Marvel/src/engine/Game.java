@@ -784,35 +784,27 @@ public class Game {
 		ArrayList<Damageable> o = new ArrayList<>();
 		Champion c = getCurrentChampion();
 		Point t = c.getLocation();
-		for(int i = 0; i < range; i++){
+		for(int i = 1; i <= range; i++){
 			switch(d){
 				case DOWN:
-					t.y--;
-					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.y][t.x] instanceof Champion || board[t.y][t.x] instanceof Cover))
-						o.add((Damageable)(board[t.y][t.x]));
+					t.x--;
+					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.x][t.y] instanceof Champion || board[t.x][t.y] instanceof Cover))
+						o.add((Damageable)(board[t.x][t.y]));
 					break;
 				case LEFT:
-					t.y++;
-					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0)){
-						if(board[t.y][t.x] instanceof Champion) {
-							o.add((Damageable)(board[t.y][t.x]));
-							return o;
-						}else {
-							if(board[t.y][t.x] instanceof Cover) {
-								o.add((Damageable)(board[t.y][t.x]));
-							}
-						}
-					}
+					t.y--;
+					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.x][t.y] instanceof Champion || board[t.x][t.y] instanceof Cover))
+						o.add((Damageable)(board[t.x][t.y]));
 					break;
 				case RIGHT:
-					t.x++;
-					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.y][t.x] instanceof Champion || board[t.y][t.x] instanceof Cover))
-						o.add((Damageable)(board[t.y][t.x]));
+					t.y++;
+					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.x][t.y] instanceof Champion || board[t.x][t.y] instanceof Cover))
+						o.add((Damageable)(board[t.x][t.y]));
 					break;
 				case UP:
-					t.y++;
-					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.y][t.x] instanceof Champion || board[t.y][t.x] instanceof Cover))
-						o.add((Damageable)(board[t.y][t.x]));
+					t.x++;
+					if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.x][t.y] instanceof Champion || board[t.x][t.y] instanceof Cover))
+						o.add((Damageable)(board[t.x][t.y]));
 					break;
 			}
 		}
