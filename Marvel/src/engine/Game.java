@@ -285,7 +285,7 @@ public class Game {
 						targets.add(co);
 				}
 
-				((DamagingAbility) (a)).execute(targets);
+				((DamagingAbility) (a)).execute(targets); //execute damaging ability
 			} else {
 				if (a instanceof HealingAbility) {
 					if (a.getCastArea() == AreaOfEffect.SELFTARGET) {
