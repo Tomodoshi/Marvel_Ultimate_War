@@ -25,7 +25,6 @@ public class DamagingAbility extends Ability {
 		for (Damageable target : targets) {
 			target.setCurrentHP(target.getCurrentHP() - damageAmount);
 		}
-		
 	}
 
 }

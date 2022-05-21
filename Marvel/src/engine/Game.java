@@ -149,6 +149,7 @@ public class Game {
 		if(!temp.isEmpty() && temp.get(0) instanceof Cover){
 			System.out.println(0);
 			((Cover)(temp.get(0))).setCurrentHP(((Cover)(temp.get(0))).getCurrentHP()- c.getAttackDamage());
+			
 		}else if(!temp.isEmpty() && temp.get(0) instanceof Champion){
 			Champion s = (Champion)(temp.get(0));
 
@@ -246,56 +247,56 @@ public class Game {
 		}
 		
 		int range = a.getCastRange();
+		ArrayList<Object> trash = new ArrayList<Object>();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		
 		if(a instanceof DamagingAbility){
-			if(getFoe() == firstPlayer){
-				if(a.getCastArea() == AreaOfEffect.TEAMTARGET) {
+			if(a.getCastArea() == AreaOfEffect.TEAMTARGET) {
+				if(getFoe() == firstPlayer){
 					for (Champion d : firstPlayer.getTeam()) {
-						if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range){
+						if(getDistance(c.getLocation(), d.getLocation()) <= range){
 							if(checkEffect(d)){
-								for (int i = 0; i < d.getAppliedEffects().size(); i++) {
-									Effect e = d.getAppliedEffects().get(i);
-									if(e instanceof Shield){
-										d.getAppliedEffects().remove(e);
-										i--;
+								for (Effect e : d.getAppliedEffects()) {
+									if(e instanceof Shield) {
+										e.remove(d);
+										trash.add(e);
 									}
 								}
-							}else{
+								d.getAppliedEffects().removeAll(trash);
+							}else {
 								targets.add(d);
 							}
 						}
 					}
-				}
-			}
-			}else{
-				for (Champion d : secondPlayer.getTeam()) {
-					if(d != c && getDistance(c.getLocation(), d.getLocation()) <= range){
-						if(checkEffect(d)){
-							for (int i = 0; i < d.getAppliedEffects().size(); i++) {
-								Effect e = d.getAppliedEffects().get(i);
-								if(e instanceof Shield){
-									d.getAppliedEffects().remove(e);
-									i--;
-								}
-							}
-						}else{
-							targets.add(d);
-						}
-					}else{
-						throw new InvalidTargetException();
+				}else{
+				for (int i = 0; i < secondPlayer.getTeam().size(); i++) {
+					Champion d = secondPlayer.getTeam().get(i);
+					if(getDistance(c.getLocation(), d.getLocation()) <= a.getCastRange()) {
+						System.out.println(0);
+						targets.add(d);
 					}
 				}
+				System.out.println(1);
 			}
-				for (Cover co: cov){
-					int dist =  getDistance(co.getLocation(), c.getLocation());
-					if(dist <= range)
-						targets.add(co);
+				((DamagingAbility)(a)).execute(targets);
+			}else {
+			if(a.getCastArea() == AreaOfEffect.SURROUND) {
+				Point t = c.getLocation();
+				for(int i = -1; i < 2; i++) {
+					for(int j = -1; j < 2; j++) {
+						if(i != c.getLocation().x || j != c.getLocation().y) {
+							t.y = t.y + j;
+							if(!(t.x >= 5 || t.x < 0 || t.y >= 5 || t.y < 0) && (board[t.x][t.y] instanceof Champion || board[t.x][t.y] instanceof Cover)) {
+								targets.add((Damageable)(board[t.x][t.y]));
+							}
+						}
+					}
+					t.x = t.x +i;
 				}
-
-			((DamagingAbility)(a)).execute(targets);
+			}
 		}
-		else{
+			
+		}else{
 			if(a instanceof HealingAbility){
 				if(a.getCastArea() == AreaOfEffect.SELFTARGET){
 					targets.add((Damageable)(c));
@@ -329,7 +330,7 @@ public class Game {
 					}
 				}
 				
-				((CrowdControlAbility)(a)).execute(targets);
+				a.execute(targets);
 			}
 		}
 
@@ -344,7 +345,7 @@ public class Game {
 		c.setMana(c.getMana() - a.getManaCost());
 		c.setCurrentActionPoints(c.getCurrentActionPoints() - a.getRequiredActionPoints());
 	}
-
+	
 	public void castAbility(Ability a, Direction d) throws NotEnoughResourcesException, UnallowedMovementException, CloneNotSupportedException, AbilityUseException{
 		Champion c = getCurrentChampion();
 		if(c.getCurrentActionPoints() < a.getRequiredActionPoints()){
@@ -366,6 +367,7 @@ public class Game {
 			throw new AbilityUseException();
 		}
 
+		ArrayList<Object> trash = new ArrayList<Object>();
 		ArrayList<Damageable> targets = new ArrayList<Damageable>();
 		int range = a.getCastRange();
 		if(getFoe() == firstPlayer)
@@ -385,9 +387,11 @@ public class Game {
 								if(checkEffect((Champion)(o))){
 									for (Effect e : ((Champion)(o)).getAppliedEffects()){
 										if(e instanceof Shield){
-											((Champion)(o)).getAppliedEffects().remove(e);										
+											e.remove((Champion)(o));
+											trash.add(e);										
 										}
 									}
+									((Champion)(o)).getAppliedEffects().removeAll(trash);
 								}else{
 									targets.add((Champion)(o));
 								}
@@ -417,9 +421,11 @@ public class Game {
 							if(checkEffect((Champion)(o))){
 								for (Effect e : ((Champion)(o)).getAppliedEffects()){
 									if(e instanceof Shield){
-										((Champion)(o)).getAppliedEffects().remove(e);										
+										e.remove((Champion)(o));
+										trash.add(e);										
 									}
 								}
+								((Champion)(o)).getAppliedEffects().removeAll(trash);
 							}else{
 								targets.add((Champion)(o));
 							}
