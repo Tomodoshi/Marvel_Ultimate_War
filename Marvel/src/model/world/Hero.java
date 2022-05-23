@@ -11,7 +11,11 @@ public class Hero extends Champion {
 	public Hero(String name, int maxHP, int mana, int maxActions, int speed, int attackRange, int attackDamage) {
 		super(name, maxHP, mana, maxActions, speed, attackRange, attackDamage);
 	}
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> 746b49927c47dc31c056f9a59990256673ca3bdb
 	@Override
 	public void useLeaderAbility(ArrayList<Champion> targets) {
 		for (Champion c : targets) {
@@ -25,6 +29,10 @@ public class Hero extends Champion {
 			Embrace Emb = new Embrace(2);
 			c.getAppliedEffects().add(Emb);
 		}
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 746b49927c47dc31c056f9a59990256673ca3bdb
 	}
 }
