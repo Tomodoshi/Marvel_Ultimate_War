@@ -1,0 +1,6 @@
+INDEX VERSION 1.131+C:\Users\mario\Desktop\M3\.metadata\.plugins\org.eclipse.jdt.core
+426655105.index
+3544883485.index
+1865797976.index
+4127013566.index
+2739525014.index
